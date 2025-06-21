@@ -1,0 +1,76 @@
+[tool.poetry]
+name = "load"
+version = "1.0.0"
+description = "Modern alternative to Python import - inspired by Go and Groovy"
+authors = ["Tom Sapletta <info@softreck.dev>"]
+license = "Apache License"
+readme = "README.md"
+homepage = "https://github.com/pyfunc/load"
+repository = "https://github.com/pyfunc/load"
+documentation = "https://github.com/pyfunc/load/wiki"
+keywords = ["import", "modules", "package-manager", "load", "go", "groovy", "python"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+]
+packages = [{include = "load", from = "src"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8.1,<4.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+black = "^23.7.0"
+flake8 = "^6.1.0"
+mypy = "^1.5.0"
+pre-commit = "^3.3.0"
+
+[tool.poetry.scripts]
+load-info = "load.core:info"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=src/load --cov-report=html --cov-report=term"
+
+[tool.coverage.run]
+source = ["src/load"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+]

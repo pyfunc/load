@@ -21,8 +21,61 @@ AUTO_PRINT = True
 PRINT_LIMIT = 1000
 PRINT_TYPES = (str, int, float, list, dict, tuple)
 
-from .registry import LoadRegistry
-from .utils import smart_print
+def smart_print(obj, name=None):
+    """Intelligent result printing"""
+    if not AUTO_PRINT:
+        return
+
+    try:
+        obj_name = name or getattr(obj, '__name__', type(obj).__name__)
+
+        if hasattr(obj, 'status_code'):  # HTTP Response
+            print(f"🌐 {obj_name}: {obj.status_code} - {obj.url}")
+            if hasattr(obj, 'json'):
+                try:
+                    data = obj.json()
+                    print(f"📄 JSON: {str(data)[:PRINT_LIMIT]}...")
+                except:
+                    print(f"📄 Text: {obj.text[:PRINT_LIMIT]}...")
+
+        elif hasattr(obj, 'shape'):  # DataFrame/Array
+            print(f"📊 {obj_name}: shape {obj.shape}")
+            print(obj.head() if hasattr(obj, 'head') else str(obj)[:PRINT_LIMIT])
+
+        elif hasattr(obj, '__len__') and len(obj) > 10:  # Long collections
+            print(f"📋 {obj_name}: {len(obj)} items")
+            print(f"First 5: {list(obj)[:5]}...")
+
+        elif isinstance(obj, PRINT_TYPES):  # Basic types
+            output = str(obj)
+            if len(output) > PRINT_LIMIT:
+                print(f"📝 {obj_name}: {output[:PRINT_LIMIT]}...")
+            else:
+                print(f"📝 {obj_name}: {output}")
+
+        elif hasattr(obj, '__dict__'):  # Objects
+            attrs = [attr for attr in dir(obj) if not attr.startswith('_')][:5]
+            print(f"🔧 {obj_name}: {type(obj).__name__} with {attrs}...")
+
+        else:
+            print(f"✅ {obj_name}: {type(obj).__name__} loaded")
+
+    except Exception as e:
+        print(f"✅ {obj_name or 'Object'}: loaded ({type(obj).__name__})")
+
+def install_package(name: str) -> bool:
+    """Install package using pip"""
+    try:
+        print(f"📦 Installing {name} from pypi...")
+        result = subprocess.run(
+            [sys.executable, "-m", "pip", "install", name],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        return result.returncode == 0
+    except Exception:
+        return False
 
 def load(name: str, alias: str = None, registry: str = None,
          install: bool = True, force: bool = False, silent: bool = False) -> Any:
@@ -60,25 +113,9 @@ def load(name: str, alias: str = None, registry: str = None,
 
     # Module not found - try to install
     if install:
-        source_type, source_name = LoadRegistry.parse_source(name)
-        success = False
-
-        if registry and registry in LoadRegistry.PRIVATE_REGISTRIES:
-            success = LoadRegistry.install_from_pypi(source_name, registry)
-        elif source_type == 'pypi':
-            success = LoadRegistry.install_from_pypi(source_name)
-        elif source_type == 'github':
-            success = LoadRegistry.install_from_github(source_name)
-        elif source_type == 'gitlab':
-            token = LoadRegistry.PRIVATE_REGISTRIES.get('private_gitlab', {}).get('token')
-            success = LoadRegistry.install_from_gitlab(source_name, token)
-        elif source_type == 'url':
-            success = LoadRegistry.install_from_url(source_name)
-
-        if success:
+        if install_package(name):
             try:
-                module_name = name.split('/')[-1] if '/' in name else name
-                module = importlib.import_module(module_name)
+                module = importlib.import_module(name)
                 _module_cache[cache_key] = module
                 if not silent:
                     smart_print(module, f"{cache_key} (installed)")
@@ -95,6 +132,9 @@ def _load_local_file(file_path: str, cache_key: str, silent: bool = False) -> An
         raise ImportError(f"File {file_path} does not exist")
 
     spec = importlib.util.spec_from_file_location(path.stem, path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot create spec for {file_path}")
+
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
@@ -138,3 +178,12 @@ def set_print_limit(limit: int):
     global PRINT_LIMIT
     PRINT_LIMIT = limit
     print(f"📏 Print limit: {limit} characters")
+
+def info():
+    """Show Load information"""
+    return {
+        'cache_size': len(_module_cache),
+        'cached_modules': list(_module_cache.keys()),
+        'auto_print': AUTO_PRINT,
+        'print_limit': PRINT_LIMIT
+    }

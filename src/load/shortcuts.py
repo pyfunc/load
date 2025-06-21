@@ -43,3 +43,13 @@ def plt():
 
 def tf():
     return load("tensorflow", "tf")
+
+# For testing - always available stdlib modules
+def json():
+    return load("json")
+
+def os():
+    return load("os")
+
+def sys():
+    return load("sys")
