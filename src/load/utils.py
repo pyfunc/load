@@ -2,16 +2,13 @@
 Utility functions for Load
 """
 
-import sys
-import os
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import imp
 import importlib
-import importlib.util
+import os
 import subprocess
-import tempfile
-import urllib.request
-import zipfile
-from pathlib import Path
-from typing import Dict, Any, Optional, List, Union
+import sys
 
 # Import from config to avoid circular imports
 from .config import _module_cache, AUTO_PRINT, PRINT_LIMIT, PRINT_TYPES
@@ -50,8 +47,20 @@ def smart_print(obj, name=None):
                 print(" {0}: {1}".format(obj_name, output))
 
         elif hasattr(obj, "__dict__"):  # Objects
-            attrs = [attr for attr in dir(obj) if not attr.startswith("_")][:5]
-            print(" {0}: {1} with {2}...".format(obj_name, type(obj).__name__, attrs))
+            try:
+                # Try to get length if it's a collection
+                length = len(obj)
+                if (length > 0 and PRINT_TYPES and 
+                        not isinstance(obj, (str, bytes, bytearray))):
+                    print(" {0}: {1} (length: {2})".format(
+                        obj_name or 'Object', 
+                        type(obj).__name__, 
+                        length))
+                else:
+                    print(" {0}: {1}".format(obj_name or 'Object', type(obj).__name__))
+            except (TypeError, AttributeError):
+                # If we can't get length, just print type
+                print(" {0}: {1}".format(obj_name or 'Object', type(obj).__name__))
 
         else:
             print(" {0}: {1} loaded".format(obj_name, type(obj).__name__))
@@ -60,35 +69,32 @@ def smart_print(obj, name=None):
         print(" {0}: loaded ({1})".format(obj_name or 'Object', type(obj).__name__))
 
 
-def load(*args, **kwargs):
-    from .core import load
-
-    return load(*args, **kwargs)
-
-
-def install_package(name: str) -> bool:
+def install_package(name):
     """Install package using pip"""
     try:
-        print(f"Installing {name} from pypi...")
-        result = subprocess.run(
+        print("Installing {0} from pypi...".format(name))
+        # For Python 2.7 compatibility, use Popen instead of subprocess.run
+        process = subprocess.Popen(
             [sys.executable, "-m", "pip", "install", name],
-            capture_output=True,
-            text=True,
-            timeout=60,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
-        return result.returncode == 0
-    except Exception:
+        # Store but ignore stdout/stderr output
+        process.communicate()
+        return process.returncode == 0
+    except (subprocess.SubprocessError, OSError) as e:
+        print("Error installing package {0}: {1}".format(name, str(e)), file=sys.stderr)
         return False
 
 
 def load(
-    name: str,
-    alias: str = None,
-    registry: str = None,
-    install: bool = True,
-    force: bool = False,
-    silent: bool = False,
-) -> Any:
+    name,
+    alias=None,
+    registry=None,
+    install=True,
+    force=False,
+    silent=False,
+):
     """
     Load module/package from various sources
 
@@ -136,20 +142,18 @@ def load(
     raise ImportError("Cannot load {0}".format(name))
 
 
-def _load_local_file(file_path: str, cache_key: str, silent: bool = False) -> Any:
+def _load_local_file(file_path, cache_key, silent=False):
     """Load local Python file"""
-    path = Path(file_path)
-    if not path.exists():
+    if not os.path.exists(file_path):
         raise ImportError("File {0} does not exist".format(file_path))
 
-    spec = importlib.util.spec_from_file_location(path.stem, path)
-    if spec is None or spec.loader is None:
-        raise ImportError("Cannot create spec for {0}".format(file_path))
-
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-
-    _module_cache[cache_key] = module
-    if not silent:
-        smart_print(module, cache_key)
-    return module
+    # For Python 2.7 compatibility, use imp.load_source
+    try:
+        module_name = os.path.splitext(os.path.basename(file_path))[0]
+        module = imp.load_source(module_name, file_path)
+        _module_cache[cache_key] = module
+        if not silent:
+            smart_print(module, cache_key)
+        return module
+    except Exception as e:
+        raise ImportError("Cannot load {0}: {1}".format(file_path, str(e)))
