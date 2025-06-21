@@ -4,14 +4,15 @@ Load is a modern alternative to Python's `import` system, inspired by the simpli
 
 ## 📚 Documentation Overview
 
-- [🚀 Installation](./installation.md)
-- [💪 Basic Usage](./usage.md)
-- [📦 Features](./features.md)
-- [🔧 API Reference](./api.md)
-- [🎯 Examples](./examples.md)
-- [🔧 Development](./development.md)
-- [🔒 Security](./security.md)
-- [📄 License](./license.md)
+> **Table of Contents**
+> - [🚀 Installation](./installation.md)
+> - [💪 Basic Usage](./usage.md)
+> - [📦 Features](./features.md)
+> - [🔧 API Reference](./api.md)
+> - [🎯 Examples](./examples.md)
+> - [🔧 Development](./development.md)
+> - [🔒 Security](./security.md)
+> - [📄 License](./license.md)
 
 ## 🚀 Quick Start
 
@@ -41,3 +42,12 @@ pandas_lib = load.pd          # Automatically installs pandas
 ## 📚 Detailed Documentation
 
 For detailed documentation, please refer to the individual sections in the sidebar.
+
+## 🔗 Related Resources
+
+- [GitHub Repository](https://github.com/pyfunc/load)
+- [PyPI Package](https://pypi.org/project/load)
+- [Examples](https://github.com/pyfunc/load/tree/main/examples)
+- [Development Guide](./development.md)
+- [API Reference](./api.md)
+- [Security Considerations](./security.md)

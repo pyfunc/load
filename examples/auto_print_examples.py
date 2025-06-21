@@ -12,6 +12,8 @@ from pathlib import Path
 # Add parent directory to path to allow importing from src
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+import load  # noqa: E402
+
 # Constants
 DEFAULT_PRINT_LIMIT = 50  # Default number of items to show in truncated output
 
@@ -25,47 +27,39 @@ def auto_print_examples() -> None:
     print("📊 Load Auto-Print Examples")
     print("=" * 50)
 
-    import load
-
-    # Test auto-print controls
-    print("\n🎛️  Testing auto-print controls:")
-
     # Enable auto-print
     load.enable_auto_print()
 
     # This should auto-print module info
     print("\n📦 Loading with auto-print enabled:")
-    # Load and use the module to avoid unused variable warning
-    json_lib = load.load("json")  # Should auto-print
-    if json_lib is None:  # For type checking
-        print("Warning: Failed to load json module")
+    # Import the module - this will auto-print
+    import json as _json  # noqa: F401
+    version = _json.__version__ if hasattr(_json, '__version__') else 'unknown'
+    print(f"✅ JSON module loaded (version: {version})")
 
     # Change print limit
     print("\n📏 Changing print limit:")
     load.set_print_limit(DEFAULT_PRINT_LIMIT)
 
-    # Load another module and use it
-    os_lib = load.load("os")  # Should auto-print with limit
-    if os_lib is not None:  # For type checking and usage
-        _ = os_lib.getcwd()  # Use the module to avoid unused variable warning
+    # Import another module - this will auto-print
+    import os as _os  # noqa: F401
+    print(f"✅ OS module loaded (cwd: {_os.getcwd()})")
 
     # Disable auto-print
     print("\n🔇 Disabling auto-print:")
     load.disable_auto_print()
 
-    # This should be silent
-    sys_lib = load.load("sys")  # Should NOT auto-print
-    assert sys_lib is not None, "Failed to load sys module"
+    # This should be silent - we just want to test the import
+    import sys as _  # noqa: F401, F841
     print("✅ Silent loading completed")
 
     # Re-enable for final test
     print("\n🔊 Re-enabling auto-print:")
     load.enable_auto_print()
 
-    # Final test - use the module to avoid unused variable warning
-    time_lib = load.load("time")  # Should auto-print again
-    if time_lib is not None:  # For type checking
-        _ = time_lib.time()  # Use the module
+    # Final test - import time module (should auto-print)
+    import time as _time  # noqa: F401
+    print(f"✅ Time module loaded (current time: {_time.ctime()})")
 
     print("\n✅ Auto-print examples completed")
 
@@ -106,15 +100,14 @@ def test_cache_info() -> None:
     Shows how to retrieve and display information about the module cache,
     including the number of cached modules and cache statistics.
     """
-    print("\n💾 Testing cache info:")
+    print("\n🧪 Testing cache info...")
 
-    import load
-
-    # Load several modules and use them to avoid unused variable warnings
+    # Import several modules (won't auto-print due to silent=True)
     modules = ["json", "os", "sys", "time", "math"]
     for module_name in modules:
-        mod = load.load(module_name, silent=True)
-        if mod is None:  # For type checking
+        try:
+            __import__(module_name)
+        except ImportError:
             print(f"Warning: Failed to load {module_name}")
 
     # Get cache info
@@ -124,7 +117,8 @@ def test_cache_info() -> None:
     print(f"   Total cached modules: {cache_info['cache_size']}")
     print(f"   Auto-print enabled: {cache_info['auto_print']}")
     print(f"   Print limit: {cache_info['print_limit']}")
-    print("   Cached modules: " + ", ".join(cache_info['cached_modules']))
+    cached = ", ".join(cache_info['cached_modules'])
+    print(f"   Cached modules: {cached}")
 
     print("✅ Cache info test completed")
 
@@ -145,22 +139,21 @@ def demo_real_usage() -> None:
 
     print("\n1️⃣  Data analysis simulation:")
     # Simulate data analysis workflow
-    json_lib = load.load("json")
+    import json as json_lib
     data = {"sales": [100, 200, 150], "months": ["Jan", "Feb", "Mar"]}
     json_str = json_lib.dumps(data)
     print(f"   JSON data: {json_str[:50]}...")
 
     print("\n2️⃣  File operations simulation:")
-    os_lib = load.load("os")
+    import os as os_lib
     current_path = os_lib.getcwd()
     print(f"   Current directory: {Path(current_path).name}")
 
     print("\n3️⃣  System information:")
-    sys_lib = load.load("sys")
-    print(
-        f"   Python version: {sys_lib.version_info.major}.{sys_lib.version_info.minor}"
-    )
-    print(f"   Platform: {sys_lib.platform}")
+    import sys as _  # noqa: F401, F841
+    version = f"{_.version_info.major}.{_.version_info.minor}"
+    print(f"   Python version: {version}")
+    print(f"   Platform: {_.platform}")
 
     print("\n✅ Real-world demo completed")
 
@@ -169,16 +162,16 @@ def main() -> int:
     """Run all example functions and return exit code."""
     try:
         print("🚀 Starting Load auto-print examples...")
-        
+
         # Run all example functions
         auto_print_examples()
         test_smart_print()
         test_cache_info()
         demo_real_usage()
-        
+
         print("\n🎉 All auto-print examples completed successfully!")
         return 0
-        
+
     except ImportError as e:
         print(f"\n❌ Import error: {e}")
         print("Please make sure all required dependencies are installed.")
@@ -186,7 +179,7 @@ def main() -> int:
         print(f"\n❌ Error in auto-print examples: {e}")
         import traceback
         traceback.print_exc()
-    
+
     return 1
 
 

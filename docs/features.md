@@ -86,3 +86,13 @@ load.enable_auto_print()
 load.set_auto_install(True)
 load.set_install_timeout(30)  # 30 seconds
 ```
+
+## 🔗 Related Resources
+
+- [Main Documentation](./index.md)
+- [Installation Guide](./installation.md)
+- [Usage Examples](./usage.md)
+- [API Reference](./api.md)
+- [Development Guide](./development.md)
+- [Example Files](https://github.com/pyfunc/load/tree/main/examples)
+- [GitHub Repository](https://github.com/pyfunc/load)

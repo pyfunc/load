@@ -191,3 +191,13 @@ load.github.user/repo  # GitHub repository
 # Local files
 load.load('./file.py')  # Local Python file
 ```
+
+## 🔗 Related Resources
+
+- [Main Documentation](./index.md)
+- [Installation Guide](./installation.md)
+- [Usage Examples](./usage.md)
+- [Development Guide](./development.md)
+- [Example Files](https://github.com/pyfunc/load/tree/main/examples)
+- [GitHub Repository](https://github.com/pyfunc/load)
+- [API Reference](https://github.com/pyfunc/load/blob/main/docs/api.md)
