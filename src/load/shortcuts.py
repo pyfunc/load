@@ -4,7 +4,6 @@ Shortcut functions for common packages
 
 from .core import load
 
-
 # Shortcut functions
 def load_pandas(alias="pd"):
     """Shortcut for loading pandas"""
@@ -75,21 +74,31 @@ def pd():
 def plt():
     """Alias for matplotlib"""
     return load_matplotlib()
-    return load("matplotlib.pyplot", "plt")
 
 
 def tf():
     return load("tensorflow", "tf")
 
 
-# For testing - always available stdlib modules
-def json():
-    return load("json")
+def cv2():
+    """Alias for OpenCV"""
+    return load_cv2()
 
 
-def os():
-    return load("os")
+def PIL():
+    """Alias for PIL"""
+    return load_pil()
 
 
+def sklearn():
+    """Alias for scikit-learn"""
+    return load_sklearn()
+
+
+# Add module-level shortcuts
+requests = load_requests
+json = load_json
+os = load_os
+sys = load_sys
 def sys():
     return load("sys")

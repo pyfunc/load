@@ -167,8 +167,6 @@ class LoadRegistry:
 
             return True
 
-        except Exception:
-                    
         except Exception as e:
             print(f"❌ Error installing from URL: {e}")
             return False
