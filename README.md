@@ -12,11 +12,19 @@ Load simplifies Python imports by:
 
 ## 🚀 Quick Start
 
+Install load using any of these methods:
+
 ```bash
-# Install with Poetry
+# 1. Using curl (Linux/macOS/WSL)
+curl -sSL https://load.pyfunc.com | python3 -
+
+# 2. Using PowerShell (Windows)
+(Invoke-WebRequest -Uri https://load.pyfunc.com -UseBasicParsing).Content | py -
+
+# 3. Using Poetry
 poetry add load
 
-# Or install from PyPI
+# 4. Using pip
 pip install load
 ```
 

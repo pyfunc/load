@@ -26,38 +26,38 @@ def smart_print(obj, name=None):
         obj_name = name or getattr(obj, "__name__", type(obj).__name__)
 
         if hasattr(obj, "status_code"):  # HTTP Response
-            print(f" {obj_name}: {obj.status_code} - {obj.url}")
+            print(" {0}: {1} - {2}".format(obj_name, obj.status_code, obj.url))
             if hasattr(obj, "json"):
                 try:
                     data = obj.json()
-                    print(f" JSON: {str(data)[:PRINT_LIMIT]}...")
+                    print(" JSON: {0}...".format(str(data)[:PRINT_LIMIT]))
                 except:
-                    print(f" Text: {obj.text[:PRINT_LIMIT]}...")
+                    print(" Text: {0}...".format(obj.text[:PRINT_LIMIT]))
 
         elif hasattr(obj, "shape"):  # DataFrame/Array
-            print(f" {obj_name}: shape {obj.shape}")
+            print(" {0}: shape {1}".format(obj_name, obj.shape))
             print(obj.head() if hasattr(obj, "head") else str(obj)[:PRINT_LIMIT])
 
         elif hasattr(obj, "__len__") and len(obj) > 10:  # Long collections
-            print(f" {obj_name}: {len(obj)} items")
-            print(f"First 5: {list(obj)[:5]}...")
+            print(" {0}: {1} items".format(obj_name, len(obj)))
+            print("First 5: {0}...".format(list(obj)[:5]))
 
         elif isinstance(obj, PRINT_TYPES):  # Basic types
             output = str(obj)
             if len(output) > PRINT_LIMIT:
-                print(f" {obj_name}: {output[:PRINT_LIMIT]}...")
+                print(" {0}: {1}...".format(obj_name, output[:PRINT_LIMIT]))
             else:
-                print(f" {obj_name}: {output}")
+                print(" {0}: {1}".format(obj_name, output))
 
         elif hasattr(obj, "__dict__"):  # Objects
             attrs = [attr for attr in dir(obj) if not attr.startswith("_")][:5]
-            print(f" {obj_name}: {type(obj).__name__} with {attrs}...")
+            print(" {0}: {1} with {2}...".format(obj_name, type(obj).__name__, attrs))
 
         else:
-            print(f" {obj_name}: {type(obj).__name__} loaded")
+            print(" {0}: {1} loaded".format(obj_name, type(obj).__name__))
 
     except Exception as e:
-        print(f" {obj_name or 'Object'}: loaded ({type(obj).__name__})")
+        print(" {0}: loaded ({1})".format(obj_name or 'Object', type(obj).__name__))
 
 
 def load(*args, **kwargs):
@@ -104,7 +104,7 @@ def load(
     if not force and cache_key in _module_cache:
         cached_obj = _module_cache[cache_key]
         if not silent:
-            smart_print(cached_obj, f"{cache_key} (cached)")
+            smart_print(cached_obj, "{0} (cached)".format(cache_key))
         return cached_obj
 
     # If local file
@@ -128,23 +128,23 @@ def load(
                 module = importlib.import_module(name)
                 _module_cache[cache_key] = module
                 if not silent:
-                    smart_print(module, f"{cache_key} (installed)")
+                    smart_print(module, "{0} (installed)".format(cache_key))
                 return module
             except ImportError:
                 pass
 
-    raise ImportError(f"Cannot load {name}")
+    raise ImportError("Cannot load {0}".format(name))
 
 
 def _load_local_file(file_path: str, cache_key: str, silent: bool = False) -> Any:
     """Load local Python file"""
     path = Path(file_path)
     if not path.exists():
-        raise ImportError(f"File {file_path} does not exist")
+        raise ImportError("File {0} does not exist".format(file_path))
 
     spec = importlib.util.spec_from_file_location(path.stem, path)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Cannot create spec for {file_path}")
+        raise ImportError("Cannot create spec for {0}".format(file_path))
 
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

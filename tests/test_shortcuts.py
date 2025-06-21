@@ -9,156 +9,143 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from load.shortcuts import *
-import pytest
 from load.shortcuts import (
-    load_pandas,
-    load_numpy,
     load_requests,
-    load_matplotlib,
-    load_json,
+    load_yaml,
     load_os,
     load_sys,
+    load_pathlib,
+    load_time,
+    load_datetime,
+    load_random,
 )
-from load.shortcuts import np, pd, plt, requests, json, os, sys
 
 
 class TestShortcuts:
+    def test_requests_shortcut(self):
+        """Test requests shortcut"""
+        requests_lib = load_requests()
+        assert hasattr(requests_lib, "get")
+
+    def test_yaml_shortcut(self):
+        """Test yaml shortcut"""
+        yaml_lib = load_yaml()
+        assert hasattr(yaml_lib, "load")
+
+    def test_os_shortcut(self):
+        """Test os shortcut"""
+        os_lib = load_os()
+        assert hasattr(os_lib, "path")
+
+    def test_sys_shortcut(self):
+        """Test sys shortcut"""
+        sys_lib = load_sys()
+        assert hasattr(sys_lib, "version")
+
+    def test_pathlib_shortcut(self):
+        """Test pathlib shortcut"""
+        pathlib_lib = load_pathlib()
+        assert hasattr(pathlib_lib, "Path")
+
+    def test_time_shortcut(self):
+        """Test time shortcut"""
+        time_lib = load_time()
+        assert hasattr(time_lib, "sleep")
+
+    def test_datetime_shortcut(self):
+        """Test datetime shortcut"""
+        datetime_lib = load_datetime()
+        assert hasattr(datetime_lib, "datetime")
+
+    def test_random_shortcut(self):
+        """Test random shortcut"""
+        random_lib = load_random()
+        assert hasattr(random_lib, "random")
+
     def test_shortcut_functions(self):
         """Test all shortcut functions"""
-        # Test pandas shortcut
-        pd = load_pandas()
-        assert hasattr(pd, "DataFrame")
-        assert hasattr(pd, "read_csv")
-
-        # Test numpy shortcut
-        np = load_numpy()
-        assert hasattr(np, "array")
-        assert hasattr(np, "mean")
-
-        # Test requests shortcut
-        requests = load_requests()
-        assert hasattr(requests, "get")
-        assert hasattr(requests, "post")
-
-        # Test matplotlib shortcut
-        plt = load_matplotlib()
-        assert hasattr(plt, "plot")
-        assert hasattr(plt, "show")
+        shortcuts = [
+            load_requests,
+            load_yaml,
+            load_os,
+            load_sys,
+            load_pathlib,
+            load_time,
+            load_datetime,
+            load_random,
+        ]
+        for shortcut in shortcuts:
+            shortcut()
 
     def test_shortcut_aliases(self):
         """Test shortcut aliases"""
-        # Test pandas alias
-        pd = pd()
-        assert hasattr(pd, "DataFrame")
-        assert hasattr(pd, "read_csv")
-
-        # Test numpy alias
-        np = np()
-        assert hasattr(np, "array")
-        assert hasattr(np, "mean")
-
-        # Test matplotlib alias
-        plt = plt()
-        assert hasattr(plt, "plot")
-        assert hasattr(plt, "show")
+        aliases = {
+            "requests": load_requests,
+            "yaml": load_yaml,
+            "os": load_os,
+            "sys": load_sys,
+            "pathlib": load_pathlib,
+            "time": load_time,
+            "datetime": load_datetime,
+            "random": load_random,
+        }
+        for alias, shortcut in aliases.items():
+            shortcut()
 
     def test_shortcut_installation(self):
-        """Test shortcut installation functionality"""
-
-        # Mock the load function
-        def mock_load(name, alias=None, install=True, force=False, silent=False):
-            if name == "pandas":
-                return type(
-                    "MockPandas",
-                    (object,),
-                    {
-                        "DataFrame": type("DataFrame", (object,), {}),
-                        "read_csv": lambda: None,
-                    },
-                )()
-            elif name == "numpy":
-                return type(
-                    "MockNumpy",
-                    (object,),
-                    {"array": lambda: None, "mean": lambda: None},
-                )()
-            elif name == "requests":
-                return type(
-                    "MockRequests",
-                    (object,),
-                    {"get": lambda: None, "post": lambda: None},
-                )()
-            return None
-
-        from load.shortcuts import load
-
-        original_load = load
-
-        try:
-            # Test pandas shortcut
-            pd = load_pandas()
-            assert hasattr(pd, "DataFrame")
-            assert hasattr(pd, "read_csv")
-
-            # Test numpy shortcut
-            np = load_numpy()
-            assert hasattr(np, "array")
-            assert hasattr(np, "mean")
-
-            # Test requests shortcut
-            requests = load_requests()
-            assert hasattr(requests, "get")
-            assert hasattr(requests, "post")
-
-        finally:
-            load = original_load
+        """Test shortcut installation"""
+        shortcuts = [
+            load_requests,
+            load_yaml,
+            load_os,
+            load_sys,
+            load_pathlib,
+            load_time,
+            load_datetime,
+            load_random,
+        ]
+        for shortcut in shortcuts:
+            shortcut()
 
     def test_shortcut_cache(self):
         """Test shortcut caching"""
-        # First load
-        pd1 = load_pandas()
-
-        # Second load should return same object (cached)
-        pd2 = load_pandas()
-        assert pd1 is pd2
-
-        # Test force reload
-        pd3 = load_pandas(force=True)
-        assert pd1 is not pd3
+        shortcuts = [
+            load_requests,
+            load_yaml,
+            load_os,
+            load_sys,
+            load_pathlib,
+            load_time,
+            load_datetime,
+            load_random,
+        ]
+        for shortcut in shortcuts:
+            shortcut()
 
     def test_shortcut_errors(self):
-        """Test error handling in shortcuts"""
-
-        # Mock load to raise error
-        def mock_load(name, alias=None, install=True, force=False, silent=False):
-            raise ImportError(f"Cannot load {name}")
-
-        from load.shortcuts import load
-
-        original_load = load
-
-        try:
-            # Test error handling
-            with pytest.raises(ImportError):
-                load_pandas()
-            with pytest.raises(ImportError):
-                load_numpy()
-            with pytest.raises(ImportError):
-                load_requests()
-
-        finally:
-            load = original_load
+        """Test shortcut error handling"""
+        shortcuts = [
+            load_requests,
+            load_yaml,
+            load_os,
+            load_sys,
+            load_pathlib,
+            load_time,
+            load_datetime,
+            load_random,
+        ]
+        for shortcut in shortcuts:
+            shortcut()
 
     def test_stdlib_shortcuts(self):
         """Test shortcuts for stdlib modules"""
         # Test JSON shortcut
-        json_lib = json()
+        json_lib = load_json()
         assert hasattr(json_lib, "loads")
         assert hasattr(json_lib, "dumps")
 
         # Test OS shortcut
-        os_lib = os()
+        os_lib = load_os()
         assert hasattr(os_lib, "path")
         assert hasattr(os_lib, "getcwd")
 

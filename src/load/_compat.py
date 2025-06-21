@@ -16,7 +16,6 @@ if PY2:
     from urllib import urlretrieve
     from urlparse import urlparse
     from StringIO import StringIO
-    from types import ClassType
 
     text_type = unicode
     binary_type = str
@@ -32,7 +31,6 @@ else:
     from io import StringIO
     from urllib.request import urlopen, urlretrieve
     from urllib.parse import urlparse
-    from types import ClassType
 
     text_type = str
     binary_type = bytes

@@ -1,0 +1,36 @@
+name: Deploy Installation Script
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      
+      - name: Deploy to load.pyfunc.com
+        env:
+          PYFUNC_TOKEN: ${{ secrets.PYFUNC_TOKEN }}
+        run: |
+          # Install dependencies
+          pip install requests
+          
+          # Get the latest version
+          VERSION=$(curl -s https://pypi.org/pypi/load/json | python -c "import json, sys; print(json.load(sys.stdin)['info']['version'])")
+          
+          # Upload the installation script
+          curl -X POST \
+            -H "Authorization: Bearer $PYFUNC_TOKEN" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @get_load.py \
+            https://api.pyfunc.com/v1/files/load.pyfunc.com/
+          
+          echo "Successfully deployed installation script for version $VERSION"

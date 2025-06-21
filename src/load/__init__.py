@@ -35,12 +35,13 @@ from .core import (
     load,
 )
 
+
 __version__ = "1.0.0"
 __author__ = "Tom Sapletta"
 __email__ = "info@softreck.dev"
 
 
-class LoadModule(with_metaclass(type, object)):
+class LoadModule(object):
     """Magic module - everything through dot notation."""
 
     def __getattr__(self, name):
@@ -86,7 +87,6 @@ class LoadModule(with_metaclass(type, object)):
             # Check if the method exists in the instance's __dict__
             if name in self.__dict__:
                 return self.__dict__[name]
-            return None
 
         # Handle common Python module aliases
         common_aliases = {
@@ -119,7 +119,6 @@ class LoadModule(with_metaclass(type, object)):
         if name in common_aliases:
             module_name = common_aliases[name]
             try:
-                # Import the module
                 module = __import__(module_name)
                 # For submodules like matplotlib.pyplot
                 if "." in module_name:
@@ -130,51 +129,80 @@ class LoadModule(with_metaclass(type, object)):
                 return module
             except ImportError:
                 raise ImportError(
-                    f"Could not import {name}. Please install it with: pip install {module_name}"
+                    "Could not import {0}. Please install it with: pip install {1}".format(name, module_name)
                 )
 
         # Popular aliases mapping
         aliases = {
-            "np": ("numpy", "np"),
-            "pd": ("pandas", "pd"),
-            "plt": ("matplotlib.pyplot", "plt"),
-            "tf": ("tensorflow", "tf"),
-            "requests": ("requests", None),
-            "json": ("json", None),
-            "os": ("os", None),
-            "sys": ("sys", None),
-            "torch": ("torch", None),
-            "cv2": ("opencv-python", "cv2"),
-            "PIL": ("pillow", "PIL"),
-            "sklearn": ("scikit-learn", "sklearn"),
+            # Data science
+            "np": "numpy",
+            "pd": "pandas",
+            "plt": "matplotlib.pyplot",
+            "sns": "seaborn",
+            # Machine learning
+            "tf": "tensorflow",
+            "torch": "torch",
+            "sklearn": "sklearn",
+            # Web and data
+            "requests": "requests",
+            "yaml": "yaml",
+            # System
+            "os": "os",
+            "sys": "sys",
+            "pathlib": "pathlib",
+            # Image processing
+            "cv2": "opencv-python",
+            "PIL": "PIL",
+            # Utilities
+            "time": "time",
+            "datetime": "datetime",
+            "random": "random",
         }
 
-        # Check for auto-print functions
-        if name in ["enable_auto_print", "disable_auto_print", "set_print_limit"]:
-            return getattr(self, name)
-
-        # Check if it's an alias
         if name in aliases:
-            module_name, alias = aliases[name]
-            return load(module_name, alias=alias)
+            module_name = aliases[name]
+            try:
+                module = __import__(module_name)
+                # For submodules like matplotlib.pyplot
+                if "." in module_name:
+                    for part in module_name.split(".")[1:]:
+                        module = getattr(module, part)
+                # Cache the module in the instance
+                setattr(self, name, module)
+                return module
+            except ImportError:
+                raise ImportError(
+                    "Could not import {0}. Please install it with: pip install {1}".format(name, module_name)
+                )
 
-        # Import load function only when needed
-        return load(name)
+        # If not found, try to load as a module
+        try:
+            module = __import__(name)
+            # For submodules like matplotlib.pyplot
+            if "." in name:
+                for part in name.split(".")[1:]:
+                    module = getattr(module, part)
+            # Cache the module in the instance
+            setattr(self, name, module)
+            return module
+        except ImportError:
+            raise ImportError("Could not import {0}".format(name))
 
     # Auto-print functions
-    def enable_auto_print(self) -> None:
+    def enable_auto_print(self):
         """Enable automatic printing of results."""
         from .core import enable_auto_print as _enable_auto_print
 
         _enable_auto_print()
 
-    def disable_auto_print(self) -> None:
+    def disable_auto_print(self):
         """Disable automatic printing of results."""
         from .core import disable_auto_print as _disable_auto_print
 
         _disable_auto_print()
 
-    def set_print_limit(self, limit: int) -> None:
+    def set_print_limit(self, limit):
+        # type: (int) -> None
         """Set the maximum number of items to print.
 
         Args:
@@ -184,7 +212,8 @@ class LoadModule(with_metaclass(type, object)):
 
         _set_print_limit(limit)
 
-    def __dir__(self) -> List[str]:
+    def __dir__(self):
+        # type: () -> List[str]
         """Return list of attributes for tab completion."""
         # Common Python aliases
         python_aliases = [
@@ -235,20 +264,22 @@ class LoadModule(with_metaclass(type, object)):
 # Create a type-safe module replacement
 class LoadModuleWrapper(LoadModule):
     """Wrapper to maintain module attributes and type safety.
-
+    
     This wrapper ensures proper type hints and module attributes
     are maintained when replacing the module with our custom class.
     """
 
-    __version__: str = __version__
-    __author__: str = __author__
-    __email__: str = __email__
-    __doc__: str = __doc__
-    __file__: str
-    __path__: List[str]
-
+    __version__ = __version__
+    __author__ = __author__
+    __email__ = __email__
+    __file__ = None
+    __path__ = []
+    __package__ = None
+    __spec__ = None
+    __loader__ = None
+    __annotations__ = {}
+    
     def __init__(self):
-        # type: () -> None
         """Initialize the module wrapper."""
         super(LoadModuleWrapper, self).__init__()
 
@@ -259,29 +290,17 @@ _original_module = sys.modules[__name__]
 # Common Python aliases that will be available with 'from load import *'
 COMMON_ALIASES = {
     # Core modules
-    "os": "os",
-    "sys": "sys",
-    "json": "json",
-    # Data science
-    "np": "numpy",
-    "pd": "pandas",
-    "plt": "matplotlib.pyplot",
-    "sns": "seaborn",
+    'os': 'os',
+    'sys': 'sys',
+    'json': 'json',
     # Web
-    "requests": "requests",
-    "yaml": "yaml",
-    # Machine learning
-    "tf": "tensorflow",
-    "torch": "torch",
-    "sklearn": "sklearn",
-    # Image processing
-    "cv2": "opencv-python",
-    "PIL": "PIL",
+    'requests': 'requests',
+    'yaml': 'yaml',
     # Utilities
-    "time": "time",
-    "datetime": "datetime",
-    "random": "random",
-    "pathlib": "pathlib",
+    'time': 'time',
+    'datetime': 'datetime',
+    'random': 'random',
+    'pathlib': 'pathlib',
 }
 
 
@@ -364,7 +383,7 @@ def import_aliases(*names):
                 module = getattr(module, part)
             result.append(module)
         except ImportError as e:
-            raise ImportError(f"Could not import {module_name}: {e}")
+            raise ImportError("Could not import {0}: {1}".format(module_name, e))
 
     return tuple(result) if len(result) > 1 else result[0] if result else None
 

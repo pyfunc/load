@@ -2,13 +2,14 @@
 Registry management for Load
 """
 
-import sys
 import os
 import subprocess
+import sys
 import tempfile
-import urllib.request
 import zipfile
-from pathlib import Path
+
+# Import compatibility layer
+from ._compat import import_module, Optional, urlretrieve, urlopen
 
 # Registry configurations
 REGISTRIES = {
@@ -86,7 +87,8 @@ class LoadRegistry:
             return "pypi", name
 
     @staticmethod
-    def install_from_pypi(name: str, registry: str = "pypi") -> bool:
+    def install_from_pypi(name, registry="pypi"):
+        # type: (str, str) -> bool
         """Install from PyPI or private registry"""
         if registry in PRIVATE_REGISTRIES:
             config = PRIVATE_REGISTRIES[registry]
@@ -98,42 +100,45 @@ class LoadRegistry:
         else:
             cmd = REGISTRIES["pypi"]["install_cmd"] + [name]
 
-        print(f"📦 Installing {name} from {registry}...")
+        print("📦 Installing {0} from {1}...".format(name, registry))
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
 
     @staticmethod
-    def install_from_github(repo: str) -> bool:
+    def install_from_github(self, repo):
+        # type: (str) -> bool
         """Install from GitHub"""
         if not repo.startswith("https://"):
-            repo = f"https://github.com/{repo}"
+            repo = "https://github.com/{0}".format(repo)
 
         cmd = [sys.executable, "-m", "pip", "install", f"git+{repo}"]
-        print(f"📦 Installing from GitHub: {repo}")
+        print("📦 Installing from GitHub: {0}".format(repo))
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
 
     @staticmethod
-    def install_from_gitlab(repo: str, token: str = None) -> bool:
+    def install_from_gitlab(self, repo, token=None):
+        # type: (str, Optional[str]) -> bool
         """Install from GitLab"""
         if not repo.startswith("https://"):
-            repo = f"https://gitlab.com/{repo}"
+            repo = "https://gitlab.com/{0}".format(repo)
 
         if token:
-            repo_with_token = repo.replace("https://", f"https://oauth2:{token}@")
-            cmd = [sys.executable, "-m", "pip", "install", f"git+{repo_with_token}"]
+            repo_with_token = repo.replace("https://", "https://oauth2:{0}@".format(token))
+            cmd = [sys.executable, "-m", "pip", "install", "git+{0}".format(repo_with_token)]
         else:
-            cmd = [sys.executable, "-m", "pip", "install", f"git+{repo}"]
+            cmd = [sys.executable, "-m", "pip", "install", "git+{0}".format(repo)]
 
-        print(f"📦 Installing from GitLab: {repo}")
+        print("📦 Installing from GitLab: {0}".format(repo))
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
 
-    def install_from_url(self, url: str) -> bool:
+    def install_from_url(self, url):
+        # type: (str) -> bool
         """Install package from URL"""
         try:
             # Download the file
-            print(f"📦 Downloading from URL: {url}")
+            print("📦 Downloading from URL: {0}".format(url))
             filename = os.path.basename(url)
             filepath = os.path.join(self.temp_dir, filename)
             urllib.request.urlretrieve(url, filepath)
@@ -173,16 +178,18 @@ class LoadRegistry:
             return True
 
         except Exception as e:
-            print(f"❌ Error installing from URL: {e}")
+            print("❌ Error installing from URL: {0}".format(e))
             return False
 
 
-def add_registry(name: str, config: dict):
+def add_registry(name, config):
+    # type: (str, dict) -> None
     """Add new registry"""
     PRIVATE_REGISTRIES[name] = config
 
 
 def list_registries():
+    # type: () -> None
     """List available registries"""
     print("🔧 Available registries:")
     print("\n📦 Public:")
@@ -194,11 +201,10 @@ def list_registries():
         print(f"  {name}: {config['description']}")
 
 
-def configure_private_registry(
-    name: str, index_url: str = None, token: str = None, base_url: str = None
-):
+def configure_private_registry(name, index_url=None, token=None, base_url=None):
+    # type: (str, Optional[str], Optional[str], Optional[str]) -> None
     """Quick private registry configuration"""
-    config = {"description": f"Private registry: {name}"}
+    config = {"description": "Private registry: {0}".format(name)}
 
     if index_url:
         config.update(
@@ -215,4 +221,4 @@ def configure_private_registry(
         config["base_url"] = base_url
 
     PRIVATE_REGISTRIES[name] = config
-    print(f"✅ Configured private registry: {name}")
+    print("✅ Configured private registry: {0}".format(name))
