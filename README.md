@@ -2,6 +2,21 @@
 
 Load is a modern alternative to Python's `import` system, inspired by the simplicity of Go and Groovy. It provides automatic package installation, intelligent caching, and magic import syntax.
 
+```mermaid
+graph TD
+    A[Python Code] --> B[load.load()]
+    B --> C{Registry Check}
+    C -->|PyPI| D[Install Package]
+    C -->|Local| E[Load File]
+    C -->|StdLib| F[Load Module]
+    D --> G[Import Module]
+    E --> G
+    F --> G
+    G --> H[Use Module]
+    style B fill:#f9f,stroke:#333,stroke-width:2px
+    style C fill:#bbf,stroke:#333,stroke-width:2px
+```
+
 ## 🎯 Purpose
 
 Load simplifies Python imports by:
@@ -9,6 +24,27 @@ Load simplifies Python imports by:
 - Automating package installation
 - Improving developer productivity
 - Making imports more intuitive
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Load as Load Library
+    participant PyPI
+    participant File
+    participant Module
+    
+    Dev->>Load: load.numpy
+    Load->>PyPI: Check Package
+    PyPI-->>Load: Return Package
+    Load->>File: Check Cache
+    File-->>Load: Return Module
+    Load-->>Dev: Return Module
+    
+    Dev->>Load: load.local_file
+    Load->>File: Load File
+    File-->>Load: Return Module
+    Load-->>Dev: Return Module
+```
 
 ## 🚀 Quick Start
 
@@ -40,7 +76,6 @@ For detailed documentation, please refer to:
 ## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](https://github.com/pyfunc/load/blob/main/CONTRIBUTING.md) for guidelines.
-
 
 ## 🔗 Links
 
