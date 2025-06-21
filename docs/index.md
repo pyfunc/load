@@ -8,6 +8,7 @@ Load is a modern alternative to Python's `import` system, inspired by the simpli
 > - [🚀 Installation](./installation.md)
 > - [💪 Basic Usage](./usage.md)
 > - [📦 Features](./features.md)
+> - [🧠 How It Works](./internals.md)
 > - [🔧 API Reference](./api.md)
 > - [🎯 Examples](./examples.md)
 > - [🔧 Development](./development.md)

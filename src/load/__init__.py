@@ -1,11 +1,23 @@
 """
 Load - Modern alternative to Python import
 Inspired by Go and Groovy simplicity
+
+Compatible with Python 2.7 and Python 3.5+
 """
+
+# Handle Python 2/3 compatibility
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import sys
 import types
-from typing import Any, Dict, List
+
+# Import compatibility layer
+from ._compat import (
+    PY2, PY3, text_type, binary_type, string_types, integer_types,
+    unicode, basestring, long, FileNotFoundError, PermissionError,
+    import_module, find_spec, with_metaclass, get_type_hints,
+    Any, Dict, List, Tuple, Union, Optional, Type, TypeVar, Text, cast
+)
 
 from .core import (
     load_github,
@@ -27,7 +39,8 @@ __email__ = "info@softreck.dev"
 class LoadModule:
     """Magic module - everything through dot notation."""
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
+        # type: (str) -> Any
         """Get attribute from the module.
         
         Handles special module attributes and provides dynamic imports.
@@ -191,14 +204,11 @@ class LoadModuleWrapper(LoadModule):
     __doc__: str = __doc__
     __file__: str
     __path__: List[str]
-    __package__: str
-    __spec__: Any
-    __loader__: Any
-    __annotations__: Dict[str, Any]
     
-    def __init__(self) -> None:
+    def __init__(self):
+        # type: () -> None
         """Initialize the module wrapper."""
-        super().__init__()
+        super(LoadModuleWrapper, self).__init__()
 
 # Store the original module before replacing it
 _original_module = sys.modules[__name__]
@@ -236,7 +246,8 @@ COMMON_ALIASES = {
     'pathlib': 'pathlib',
 }
 
-def _import_common_aliases() -> None:
+def _import_common_aliases():
+    # type: () -> None
     """Import and inject common aliases into the module's globals."""
     import importlib
     import sys
@@ -281,11 +292,50 @@ new_module.disable_auto_print = module_wrapper.disable_auto_print
 new_module.set_print_limit = module_wrapper.set_print_limit
 new_module.info = core_info  # Use the already imported core_info
 
+def import_aliases(*names):
+    # type: (*str) -> tuple
+    """Import multiple modules and return them as a tuple.
+    
+    Args:
+        *names: Module names to import. Can include aliases using 'alias=module_name' syntax.
+        
+    Returns:
+        A tuple containing the imported modules in the order they were requested.
+        
+    Example:
+        # Import with default names
+        np, pd = import_aliases('numpy', 'pandas')
+        
+        # Import with aliases
+        plt, sns = import_aliases('plt=matplotlib.pyplot', 'sns=seaborn')
+    """
+    result = []
+    for name in names:
+        if '=' in name:
+            module_name = name.split('=', 1)[1]  # We don't use the alias here
+        else:
+            module_name = name
+            
+        try:
+            module = __import__(module_name.split('.')[0])
+            # Handle submodules (e.g., matplotlib.pyplot)
+            for part in module_name.split('.')[1:]:
+                module = getattr(module, part)
+            result.append(module)
+        except ImportError as e:
+            raise ImportError(f"Could not import {module_name}: {e}")
+    
+    return tuple(result) if len(result) > 1 else result[0] if result else None
+
 # Import and inject common aliases
 _import_common_aliases()
 
 # Replace the module in sys.modules with our new module
 sys.modules[__name__] = new_module
+
+# Add the import_aliases and load functions to the module
+new_module.import_aliases = import_aliases
+new_module.load = load
 
 # Common Python aliases that will be available with 'from load import *'
 __all__ = [
@@ -299,7 +349,8 @@ __all__ = [
     "set_print_limit",
     "info",
     "load",
-    
+    "import_aliases",  
+    # Add the helper function to __all__
     # Common data science aliases
     "np", "pd", "plt", "sns",
     

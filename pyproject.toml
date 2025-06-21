@@ -13,7 +13,13 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 2",
+    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -26,7 +32,11 @@ classifiers = [
 packages = [{include = "load", from = "src"}]
 
 [tool.poetry.dependencies]
-python = ">=3.8.1,<4.0"
+python = ">=2.7,<4.0"
+six = "^1.16.0"
+future = "^1.0.0"
+pathlib2 = { version = "^2.3.7", python = "<3.0" }
+typing = { version = "^3.7.4", python = "<3.5" }
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
@@ -45,7 +55,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py27', 'py38']
 
 [tool.mypy]
 python_version = "3.8"
