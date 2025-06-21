@@ -1,45 +1,43 @@
-# Load Documentation
+# 🔥 Load - Modern Python Import Alternative
 
-## Installation
+Load is a modern alternative to Python's `import` system, inspired by the simplicity of Go and Groovy. It provides automatic package installation, intelligent caching, and magic import syntax.
+
+## 📚 Documentation Overview
+
+- [🚀 Installation](./installation.md)
+- [💪 Basic Usage](./usage.md)
+- [📦 Features](./features.md)
+- [🔧 API Reference](./api.md)
+- [🎯 Examples](./examples.md)
+- [🔧 Development](./development.md)
+- [🔒 Security](./security.md)
+- [📄 License](./license.md)
+
+## 🚀 Quick Start
 
 ```bash
+# Install with Poetry
+poetry add load
+
+# Or install from PyPI
 pip install load
 ```
 
-## Basic Usage
+## 💪 Usage Example
 
 ```python
 import load
 
-# Load packages
-requests_lib = load.requests
-numpy_lib = load.np
+# Magic import - everything through dot notation
+json_lib = load.json
+os_lib = load.os
+sys_lib = load.sys
+
+# Auto-install external packages
+requests_lib = load.requests  # Automatically installs requests
+pandas_lib = load.pd          # Automatically installs pandas
 ```
 
-## Advanced Features
+## 📚 Detailed Documentation
 
-### Multiple Registries
-
-- PyPI (default)
-- GitHub repositories
-- GitLab repositories
-- Private registries
-- Direct URLs
-- Local files
-
-### Auto-print
-
-Load automatically displays results like in Jupyter notebooks.
-
-### Registry Configuration
-
-```python
-load.configure_private_registry(
-    "company",
-    index_url="https://pypi.company.com/simple/"
-)
-```
-
-## Examples
-
-See `/examples` for complete examples.
+For detailed documentation, please refer to the individual sections in the sidebar.
