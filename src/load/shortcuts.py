@@ -4,6 +4,7 @@ Shortcut functions for common packages
 
 from .core import load
 
+
 # Shortcut functions
 def load_pandas(alias="pd", install=True, force=False, silent=False):
     """Shortcut for loading pandas"""
@@ -41,7 +42,9 @@ def load_torch(install=True, force=False, silent=False):
         return load("torch", install=install, force=force, silent=silent)
     except ImportError:
         if not silent:
-            print("Warning: PyTorch is not installed. Install it with: pip install torch")
+            print(
+                "Warning: PyTorch is not installed. Install it with: pip install torch"
+            )
         raise
 
 
@@ -51,7 +54,9 @@ def load_cv2(install=True, force=False, silent=False):
         return load("cv2", alias="cv2", install=install, force=force, silent=silent)
     except ImportError:
         if not silent:
-            print("Warning: OpenCV is not installed. Install it with: pip install opencv-python")
+            print(
+                "Warning: OpenCV is not installed. Install it with: pip install opencv-python"
+            )
         raise
 
 
@@ -61,27 +66,41 @@ def load_pil(install=True, force=False, silent=False):
         return load("PIL", alias="PIL", install=install, force=force, silent=silent)
     except ImportError:
         if not silent:
-            print("Warning: Pillow is not installed. Install it with: pip install pillow")
+            print(
+                "Warning: Pillow is not installed. Install it with: pip install pillow"
+            )
         raise
 
 
 def load_sklearn(install=True, force=False, silent=False):
     """Shortcut for loading scikit-learn"""
     try:
-        return load("sklearn", alias="sklearn", install=install, force=force, silent=silent)
+        return load(
+            "sklearn", alias="sklearn", install=install, force=force, silent=silent
+        )
     except ImportError:
         if not silent:
-            print("Warning: scikit-learn is not installed. Install it with: pip install scikit-learn")
+            print(
+                "Warning: scikit-learn is not installed. Install it with: pip install scikit-learn"
+            )
         raise
 
 
 def load_matplotlib(alias="plt", install=True, force=False, silent=False):
     """Shortcut for loading matplotlib"""
     try:
-        return load("matplotlib.pyplot", alias=alias, install=install, force=force, silent=silent)
+        return load(
+            "matplotlib.pyplot",
+            alias=alias,
+            install=install,
+            force=force,
+            silent=silent,
+        )
     except ImportError:
         if not silent:
-            print("Warning: matplotlib is not installed. Install it with: pip install matplotlib")
+            print(
+                "Warning: matplotlib is not installed. Install it with: pip install matplotlib"
+            )
         raise
 
 
@@ -104,10 +123,14 @@ def plt(install=True, force=False, silent=False):
 def tf(install=True, force=False, silent=False):
     """Alias for tensorflow"""
     try:
-        return load("tensorflow", alias="tf", install=install, force=force, silent=silent)
+        return load(
+            "tensorflow", alias="tf", install=install, force=force, silent=silent
+        )
     except ImportError:
         if not silent:
-            print("Warning: TensorFlow is not installed. Install it with: pip install tensorflow")
+            print(
+                "Warning: TensorFlow is not installed. Install it with: pip install tensorflow"
+            )
         raise
 
 
@@ -131,5 +154,7 @@ requests = load_requests
 json = load_json
 os = load_os
 sys = load_sys
+
+
 def sys():
     return load("sys")

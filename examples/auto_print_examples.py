@@ -34,7 +34,8 @@ def auto_print_examples() -> None:
     print("\n📦 Loading with auto-print enabled:")
     # Import the module - this will auto-print
     import json as _json  # noqa: F401
-    version = _json.__version__ if hasattr(_json, '__version__') else 'unknown'
+
+    version = _json.__version__ if hasattr(_json, "__version__") else "unknown"
     print(f"✅ JSON module loaded (version: {version})")
 
     # Change print limit
@@ -43,6 +44,7 @@ def auto_print_examples() -> None:
 
     # Import another module - this will auto-print
     import os as _os  # noqa: F401
+
     print(f"✅ OS module loaded (cwd: {_os.getcwd()})")
 
     # Disable auto-print
@@ -51,6 +53,7 @@ def auto_print_examples() -> None:
 
     # This should be silent - we just want to test the import
     import sys as _  # noqa: F401, F841
+
     print("✅ Silent loading completed")
 
     # Re-enable for final test
@@ -59,6 +62,7 @@ def auto_print_examples() -> None:
 
     # Final test - import time module (should auto-print)
     import time as _time  # noqa: F401
+
     print(f"✅ Time module loaded (current time: {_time.ctime()})")
 
     print("\n✅ Auto-print examples completed")
@@ -117,7 +121,7 @@ def test_cache_info() -> None:
     print(f"   Total cached modules: {cache_info['cache_size']}")
     print(f"   Auto-print enabled: {cache_info['auto_print']}")
     print(f"   Print limit: {cache_info['print_limit']}")
-    cached = ", ".join(cache_info['cached_modules'])
+    cached = ", ".join(cache_info["cached_modules"])
     print(f"   Cached modules: {cached}")
 
     print("✅ Cache info test completed")
@@ -140,17 +144,20 @@ def demo_real_usage() -> None:
     print("\n1️⃣  Data analysis simulation:")
     # Simulate data analysis workflow
     import json as json_lib
+
     data = {"sales": [100, 200, 150], "months": ["Jan", "Feb", "Mar"]}
     json_str = json_lib.dumps(data)
     print(f"   JSON data: {json_str[:50]}...")
 
     print("\n2️⃣  File operations simulation:")
     import os as os_lib
+
     current_path = os_lib.getcwd()
     print(f"   Current directory: {Path(current_path).name}")
 
     print("\n3️⃣  System information:")
     import sys as _  # noqa: F401, F841
+
     version = f"{_.version_info.major}.{_.version_info.minor}"
     print(f"   Python version: {version}")
     print(f"   Platform: {_.platform}")
@@ -178,6 +185,7 @@ def main() -> int:
     except Exception as e:
         print(f"\n❌ Error in auto-print examples: {e}")
         import traceback
+
         traceback.print_exc()
 
     return 1
