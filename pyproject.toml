@@ -1,18 +1,30 @@
 [tool.poetry]
 name = "load"
-version = "1.0.3"
-description = "Modern alternative to Python import - inspired by Go and Groovy"
+version = "1.0.4"
+description = "Modern alternative to Python import - inspired by Go and Groovy. Compatible with Python 2.7 and 3.5+."
 authors = ["Tom Sapletta <info@softreck.dev>"]
-license = "Apache License"
+license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://github.com/pyfunc/load"
 repository = "https://github.com/pyfunc/load"
 documentation = "https://github.com/pyfunc/load/wiki"
-keywords = ["import", "modules", "package-manager", "load", "go", "groovy", "python"]
+keywords = [
+    "import", 
+    "modules", 
+    "package-manager", 
+    "load", 
+    "go", 
+    "groovy", 
+    "python",
+    "python2",
+    "python3",
+    "compatibility"
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: Apache Software License 2.0",
+    "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 2",
     "Programming Language :: Python :: 2.7",
@@ -28,6 +40,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: System :: Systems Administration",
     "Topic :: Utilities",
+    "Typing :: Typed"
 ]
 packages = [{include = "load", from = "src"}]
 
@@ -45,6 +58,7 @@ black = "^23.7.0"
 flake8 = "^6.1.0"
 mypy = "^1.5.0"
 pre-commit = "^3.3.0"
+tox = "^4.6.0"
 
 [tool.poetry.scripts]
 load-info = "load.core:info"
@@ -55,7 +69,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 88
-target-version = ['py27', 'py38']
+target-version = ['py38']  # Black doesn't support Python 2.7, but we'll handle compatibility in code
 
 [tool.mypy]
 python_version = "3.8"

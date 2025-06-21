@@ -43,19 +43,57 @@ We welcome contributions! Please see [CONTRIBUTING.md](https://github.com/pyfunc
 
 ## 🔍 Real-World Example
 
+### Data Science Workflow
+
 ```python
 # Traditional way
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.linear_model import LinearRegression
 
 # With Load
-import load
-np = load.np
-pd = load.pd
-plt = load.plt
-sns = load.sns
+from load import load, import_aliases
+
+# Single import
+np = load('numpy')
+
+# Multiple imports with aliases
+pd, plt, sns = import_aliases('pandas', 'plt=matplotlib.pyplot', 'seaborn')
+
+# Direct attribute access
+model = load('sklearn.linear_model.LinearRegression')()
+
+# Now use them as usual
+data = pd.DataFrame({'x': [1, 2, 3], 'y': [1, 2, 3]})
+model.fit(data[['x']], data['y'])
+plt.scatter(data['x'], data['y'])
+plt.plot(data['x'], model.predict(data[['x']]), 'r')
+plt.show()
+```
+
+### Web Development
+
+```python
+from load import load, configure_private_registry
+
+# Configure private registry
+configure_private_registry(
+    name="company",
+    index_url="https://pypi.company.com/simple/"
+)
+
+# Import standard and private packages
+fastapi = load('fastapi')
+internal_auth = load('company-auth', registry="company")
+
+app = fastapi.FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+```
 
 ### 🔒 Prywatne rejestry
 

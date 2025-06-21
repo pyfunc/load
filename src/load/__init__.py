@@ -11,12 +11,16 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sys
 import types
 
-# Import compatibility layer
+# Type hints
+from typing import List  # noqa: F401
+
+# Import only what we need from the compatibility layer
 from ._compat import (
-    PY2, PY3, text_type, binary_type, string_types, integer_types,
-    unicode, basestring, long, FileNotFoundError, PermissionError,
-    import_module, find_spec, with_metaclass, get_type_hints,
-    Any, Dict, List, Tuple, Union, Optional, Type, TypeVar, Text, cast
+    import_module,  # Used in _import_common_aliases
+    with_metaclass,  # Used for LoadModule metaclass
+    Any,  # Used for type hints
+    Dict,  # Used for type hints
+    Optional,  # Used for type hints
 )
 
 from .core import (
@@ -36,7 +40,7 @@ __author__ = "Tom Sapletta"
 __email__ = "info@softreck.dev"
 
 
-class LoadModule:
+class LoadModule(with_metaclass(type, object)):
     """Magic module - everything through dot notation."""
 
     def __getattr__(self, name):
