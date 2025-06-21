@@ -2,21 +2,6 @@
 
 Load is a modern alternative to Python's `import` system, inspired by the simplicity of Go and Groovy. It provides automatic package installation, intelligent caching, and magic import syntax.
 
-```mermaid
-graph TD
-    A[Python Code] --> B[load.load()]
-    B --> C{Registry Check}
-    C -->|PyPI| D[Install Package]
-    C -->|Local| E[Load File]
-    C -->|StdLib| F[Load Module]
-    D --> G[Import Module]
-    E --> G
-    F --> G
-    G --> H[Use Module]
-    style B fill:#f9f,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-```
-
 ## 🎯 Purpose
 
 Load simplifies Python imports by:
@@ -24,27 +9,6 @@ Load simplifies Python imports by:
 - Automating package installation
 - Improving developer productivity
 - Making imports more intuitive
-
-```mermaid
-sequenceDiagram
-    participant Dev as Developer
-    participant Load as Load Library
-    participant PyPI
-    participant File
-    participant Module
-    
-    Dev->>Load: load.numpy
-    Load->>PyPI: Check Package
-    PyPI-->>Load: Return Package
-    Load->>File: Check Cache
-    File-->>Load: Return Module
-    Load-->>Dev: Return Module
-    
-    Dev->>Load: load.local_file
-    Load->>File: Load File
-    File-->>Load: Return Module
-    Load-->>Dev: Return Module
-```
 
 ## 🚀 Quick Start
 
@@ -56,13 +20,6 @@ poetry add load
 pip install load
 ```
 
-## 💡 Key Benefits
-
-- 🚀 **Simpler imports**: Replace multiple `import` statements with a single `load` statement
-- 🎯 **Smart package management**: Automatically installs missing packages
-- 💾 **Faster development**: Built-in caching for faster repeated imports
-- 📊 **Better feedback**: Shows loading status and errors clearly
-
 ## 📚 Documentation
 
 For detailed documentation, please refer to:
@@ -72,6 +29,7 @@ For detailed documentation, please refer to:
 - [📦 Features List](https://github.com/pyfunc/load/blob/main/docs/features.md)
 - [🔧 API Reference](https://github.com/pyfunc/load/blob/main/docs/api.md)
 - [🎯 Examples](https://github.com/pyfunc/load/tree/main/examples)
+- [📊 Diagrams](https://github.com/pyfunc/load/blob/main/docs/diagrams.md)
 
 ## 🤝 Contributing
 
@@ -82,52 +40,22 @@ We welcome contributions! Please see [CONTRIBUTING.md](https://github.com/pyfunc
 - [GitHub Repository](https://github.com/pyfunc/load)
 - [PyPI Package](https://pypi.org/project/load)
 - [Examples](https://github.com/pyfunc/load/tree/main/examples)
-- [Issues](https://github.com/pyfunc/load/issues)
-- [PyPI](https://pypi.org/project/load/)
 
----
-
-**Load - because imports should be simple!** 🚀
-```
-
-**Nie kombinuj z pip!** Load automatycznie wykrywa i instaluje z różnych źródeł - PyPI, GitHub, GitLab, prywatne rejestry, URL, lokalne pliki.
-
-## 🚀 Instalacja
-
-Skopiuj `load.py` do projektu. Zero konfiguracji.
-
-## 💪 Podstawowe użycie
+## 🔍 Real-World Example
 
 ```python
-from load import *
+# Traditional way
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# PyPI (domyślnie)
-http = requests()           # Auto-instaluje requests z PyPI
-data = pd()                # pandas z PyPI
-
-# GitHub  
-awesome = load("user/awesome-lib")     # GitHub repo
-ortools = load("google/or-tools")      # Google OR-Tools
-
-# Lokalne
-utils = load("./utils.py")             # Lokalny plik
-config = load("../config.py")          # Względna ścieżka
-
-# URL
-remote = load("https://example.com/lib.py")  # Bezpośrednio z URL
-```
-
-## 🔧 Rejestry Python
-
-### 📦 Publiczne rejestry
-
-| Rejestr | Szacowana liczba pakietów | Przykład użycia |
-|---------|---------------------------|-----------------|
-| **PyPI** | ~500,000 pakietów | `load("requests")` |
-| **GitHub** | ~miliony repozytoriów | `load("user/repo")` |
-| **GitLab** | ~setki tysięcy | `load("gitlab.com/user/proj")` |
-| **SourceForge** | ~starsze projekty | `load("url...")` |
-| **Bitbucket** | ~tysiące | `load("url...")` |
+# With Load
+import load
+np = load.np
+pd = load.pd
+plt = load.plt
+sns = load.sns
 
 ### 🔒 Prywatne rejestry
 
