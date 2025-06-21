@@ -31,6 +31,7 @@ format:
 	poetry run black src tests examples
 
 build:
+	poetry version patch
 	poetry build
 
 publish: build

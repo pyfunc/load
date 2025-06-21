@@ -10,8 +10,8 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from src.load.registry import LoadRegistry, REGISTRIES, PRIVATE_REGISTRIES
-from src.load.registry import list_registries, add_registry, configure_private_registry
+from load.registry import LoadRegistry, REGISTRIES, PRIVATE_REGISTRIES
+from load.registry import list_registries, add_registry, configure_private_registry
 
 
 class TestRegistry:
