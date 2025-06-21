@@ -11,17 +11,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sys
 import types
 
-# Type hints
-from typing import List  # noqa: F401
-
 # Import only what we need from the compatibility layer
-from ._compat import (
-    import_module,  # Used in _import_common_aliases
-    with_metaclass,  # Used for LoadModule metaclass
-    Any,  # Used for type hints
-    Dict,  # Used for type hints
-    Optional,  # Used for type hints
-)
+from ._compat import import_module  # Used in _import_common_aliases
+
+# For Python 2/3 compatibility
+PY2 = sys.version_info[0] == 2
+PY3 = not PY2
 
 from .core import (
     load_github,
@@ -45,7 +40,6 @@ class LoadModule(object):
     """Magic module - everything through dot notation."""
 
     def __getattr__(self, name):
-        # type: (str) -> Any
         """Get attribute from the module.
 
         Handles special module attributes and provides dynamic imports.
@@ -202,7 +196,6 @@ class LoadModule(object):
         _disable_auto_print()
 
     def set_print_limit(self, limit):
-        # type: (int) -> None
         """Set the maximum number of items to print.
 
         Args:
@@ -213,7 +206,6 @@ class LoadModule(object):
         _set_print_limit(limit)
 
     def __dir__(self):
-        # type: () -> List[str]
         """Return list of attributes for tab completion."""
         # Common Python aliases
         python_aliases = [
@@ -305,7 +297,6 @@ COMMON_ALIASES = {
 
 
 def _import_common_aliases():
-    # type: () -> None
     """Import and inject common aliases into the module's globals."""
     import importlib
     import sys
@@ -353,7 +344,6 @@ new_module.info = core_info  # Use the already imported core_info
 
 
 def import_aliases(*names):
-    # type: (*str) -> tuple
     """Import multiple modules and return them as a tuple.
 
     Args:
@@ -372,7 +362,7 @@ def import_aliases(*names):
     result = []
     for name in names:
         if "=" in name:
-            module_name = name.split("=", 1)[1]  # We don't use the alias here
+            alias, module_name = name.split("=", 1)
         else:
             module_name = name
 
