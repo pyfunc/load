@@ -122,59 +122,52 @@ class LoadRegistry:
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
 
-    @staticmethod
-    def install_from_url(url: str) -> bool:
-        """Install from URL"""
-        print(f"📦 Downloading from URL: {url}")
+    def install_from_url(self, url: str) -> bool:
+        """Install package from URL"""
         try:
-            # Create a temporary directory
-            with tempfile.TemporaryDirectory() as temp_dir:
-                if url.endswith('.zip'):
-                    # Download the file
-                    filename = os.path.join(temp_dir, 'package.zip')
-                    urllib.request.urlretrieve(url, filename)
-                    
-                    # Extract the archive
-                    with zipfile.ZipFile(filename, 'r') as zip_ref:
-                        zip_ref.extractall(temp_dir)
-                    
-                    # Look for setup.py in the extracted files
-                    for root, dirs, files in os.walk(temp_dir):
-                        if 'setup.py' in files:
-                            # Install the package
-                            subprocess.run(
-                                [sys.executable, 'setup.py', 'install'],
-                                cwd=root,
-                                check=True
-                            )
-                            return True
-                    
-                    # If no setup.py found, try installing directly with pip
-                    subprocess.run(
-                        [sys.executable, '-m', 'pip', 'install', temp_dir],
-                        check=True
+            # Download the file
+            print(f"📦 Downloading from URL: {url}")
+            filename = os.path.basename(url)
+            filepath = os.path.join(self.temp_dir, filename)
+            urllib.request.urlretrieve(url, filepath)
+
+            # If it's a ZIP file
+            if filepath.endswith('.zip'):
+                with zipfile.ZipFile(filepath, 'r') as zip_ref:
+                    zip_ref.extractall(self.temp_dir)
+                # Try to find and import the package
+                for root, dirs, files in os.walk(self.temp_dir):
+                    for file in files:
+                        if file.endswith('.py'):
+                            try:
+                                spec = importlib.util.spec_from_file_location(
+                                    os.path.splitext(file)[0],
+                                    os.path.join(root, file)
+                                )
+                                if spec:
+                                    module = importlib.util.module_from_spec(spec)
+                                    spec.loader.exec_module(module)
+                                    return True
+                            except Exception:
+                                continue
+
+            # If it's a single Python file
+            elif filepath.endswith('.py'):
+                try:
+                    spec = importlib.util.spec_from_file_location(
+                        os.path.splitext(filename)[0],
+                        filepath
                     )
-                    return True
-                    
-                elif url.endswith('.py'):
-                    # Handle single Python file
-                    file_path = os.path.join(temp_dir, 'module.py')
-                    urllib.request.urlretrieve(url, file_path)
-                    
-                    # Install the module
-                    subprocess.run(
-                        [sys.executable, '-m', 'pip', 'install', file_path],
-                        check=True
-                    )
-                    return True
-                    
-                else:
-                    # Try to install directly with pip
-                    subprocess.run(
-                        [sys.executable, '-m', 'pip', 'install', url],
-                        check=True
-                    )
-                    return True
+                    if spec:
+                        module = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(module)
+                        return True
+                except Exception:
+                    pass
+
+            return True
+
+        except Exception:
                     
         except Exception as e:
             print(f"❌ Error installing from URL: {e}")

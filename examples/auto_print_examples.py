@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+
 def auto_print_examples():
     """Auto-print examples"""
     print("📊 Load Auto-Print Examples")
@@ -22,21 +23,21 @@ def auto_print_examples():
 
     # This should auto-print module info
     print("\n📦 Loading with auto-print enabled:")
-    json_lib = load.load('json')  # Should auto-print
+    json_lib = load.load("json")  # Should auto-print
 
     # Change print limit
     print("\n📏 Changing print limit:")
     load.set_print_limit(50)
 
     # Load another module
-    os_lib = load.load('os')  # Should auto-print with limit
+    os_lib = load.load("os")  # Should auto-print with limit
 
     # Disable auto-print
     print("\n🔇 Disabling auto-print:")
     load.disable_auto_print()
 
     # This should be silent
-    sys_lib = load.load('sys')  # Should NOT auto-print
+    sys_lib = load.load("sys")  # Should NOT auto-print
     print("✅ Silent loading completed")
 
     # Re-enable for final test
@@ -44,9 +45,10 @@ def auto_print_examples():
     load.enable_auto_print()
 
     # Final test
-    time_lib = load.load('time')  # Should auto-print again
+    time_lib = load.load("time")  # Should auto-print again
 
     print("\n✅ Auto-print examples completed")
+
 
 def test_smart_print():
     """Test smart print functionality"""
@@ -68,9 +70,11 @@ def test_smart_print():
 
     # Module
     import json
+
     smart_print(json, "json_module")
 
     print("✅ Smart print tests completed")
+
 
 def test_cache_info():
     """Test cache information display"""
@@ -79,7 +83,7 @@ def test_cache_info():
     import load
 
     # Load several modules
-    modules = ['json', 'os', 'sys', 'time', 'math']
+    modules = ["json", "os", "sys", "time", "math"]
     for module_name in modules:
         load.load(module_name, silent=True)
 
@@ -93,6 +97,7 @@ def test_cache_info():
     print(f"   Cached modules: {', '.join(cache_info['cached_modules'])}")
 
     print("✅ Cache info test completed")
+
 
 def demo_real_usage():
     """Demo real-world usage scenarios"""
@@ -117,10 +122,13 @@ def demo_real_usage():
 
     print("\n3️⃣  System information:")
     sys_lib = load.sys
-    print(f"   Python version: {sys_lib.version_info.major}.{sys_lib.version_info.minor}")
+    print(
+        f"   Python version: {sys_lib.version_info.major}.{sys_lib.version_info.minor}"
+    )
     print(f"   Platform: {sys_lib.platform}")
 
     print("\n✅ Real-world demo completed")
+
 
 if __name__ == "__main__":
     try:
@@ -132,5 +140,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ Error in auto-print examples: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

@@ -8,6 +8,7 @@ from pathlib import Path
 # Add src to path for development
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+
 def basic_examples():
     """Basic Load examples"""
     print("🔥 Load Basic Examples")
@@ -48,6 +49,7 @@ def basic_examples():
 
     print(f"\n✅ Basic examples completed successfully!")
 
+
 def test_auto_print():
     """Test auto-print functionality"""
     print("\n📊 Testing auto-print:")
@@ -58,15 +60,16 @@ def test_auto_print():
     load.enable_auto_print()
 
     # This should auto-print
-    time_lib = load.load('time', silent=False)
+    time_lib = load.load("time", silent=False)
 
     # Disable auto-print
     load.disable_auto_print()
 
     # This should be silent
-    math_lib = load.load('math', silent=False)
+    math_lib = load.load("math", silent=False)
 
     print("✅ Auto-print test completed")
+
 
 def test_aliases():
     """Test alias functionality"""
@@ -75,14 +78,17 @@ def test_aliases():
     import load
 
     # Load with alias
-    operating_system = load.load('os', alias='operating_system', silent=True)
-    time_module = load.load('time', alias='time_utils', silent=True)
+    operating_system = load.load("os", alias="operating_system", silent=True)
+    time_module = load.load("time", alias="time_utils", silent=True)
 
     print("✅ Alias loading completed")
 
     # Check cache
     cache_info = load.info()
-    print(f"   Aliases in cache: {[m for m in cache_info['cached_modules'] if '_' in m]}")
+    print(
+        f"   Aliases in cache: {[m for m in cache_info['cached_modules'] if '_' in m]}"
+    )
+
 
 if __name__ == "__main__":
     try:
