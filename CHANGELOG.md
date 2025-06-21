@@ -2,22 +2,30 @@
 
 All notable changes to Load will be documented in this file.
 
-## [1.0.0] - 2024-01-XX
+## [1.0.0] - 2025-06-21
 
 ### Added
 - Initial release of Load
 - Magic import functionality (`import load`)
-- Auto-installation from multiple registries
+- Auto-installation from PyPI
 - Smart auto-print for results
-- Support for PyPI, GitHub, GitLab, private registries
 - RAM caching for fast repeated loading
+- Support for local file loading
 - Comprehensive test suite
-- Full documentation
+- Full documentation and examples
 
 ### Features
-- 🚀 Auto-installation of missing packages
-- 📊 Auto-print results like Jupyter/REPL
-- 🔧 Multiple registry support
+- 🚀 Magic import - access modules via `load.module_name`
+- 📊 Auto-print results like Jupyter/REPL  
 - 💾 Intelligent RAM caching
-- 🎯 Smart source detection
-- 🔒 Private registry support
+- 🎯 Smart module detection
+- 📁 Local Python file support
+- 🔧 Configurable auto-print settings
+
+### Developer Features
+- Poetry-based development environment
+- Comprehensive test suite with pytest
+- Code formatting with Black
+- Linting with Flake8
+- Type checking with MyPy
+- Makefile for common tasks
