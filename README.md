@@ -1,4 +1,66 @@
 # 🔥 Load - Import z wieloma rejestrami
+# README.md
+
+```markdown
+# 🔥 Load - Modern Python Import Alternative
+
+Load is a modern alternative to Python's `import` system, inspired by the simplicity of Go and Groovy. It provides automatic package installation, intelligent caching, and magic import syntax.
+
+## 🎯 Purpose
+
+Load simplifies Python imports by:
+- Reducing boilerplate code
+- Automating package installation
+- Improving developer productivity
+- Making imports more intuitive
+
+## 🚀 Quick Start
+
+```bash
+# Install with Poetry
+poetry add load
+
+# Or install from PyPI
+pip install load
+```
+
+## 💡 Key Benefits
+
+- 🚀 **Simpler imports**: Replace multiple `import` statements with a single `load` statement
+- 🎯 **Smart package management**: Automatically installs missing packages
+- 💾 **Faster development**: Built-in caching for faster repeated imports
+- 📊 **Better feedback**: Shows loading status and errors clearly
+
+## 📚 Documentation
+
+For detailed documentation, please refer to:
+
+- [📚 Installation Guide](https://github.com/pyfunc/load/blob/main/docs/installation.md)
+- [💪 Usage Examples](https://github.com/pyfunc/load/blob/main/docs/usage.md)
+- [📦 Features List](https://github.com/pyfunc/load/blob/main/docs/features.md)
+- [🔧 API Reference](https://github.com/pyfunc/load/blob/main/docs/api.md)
+- [🎯 Examples](https://github.com/pyfunc/load/tree/main/examples)
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](https://github.com/pyfunc/load/blob/main/CONTRIBUTING.md) for guidelines.
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+## 🔗 Links
+
+- [GitHub Repository](https://github.com/pyfunc/load)
+- [PyPI Package](https://pypi.org/project/load)
+- [Examples](https://github.com/pyfunc/load/tree/main/examples)
+- [Issues](https://github.com/pyfunc/load/issues)
+- [PyPI](https://pypi.org/project/load/)
+
+---
+
+**Load - because imports should be simple!** 🚀
+```
 
 **Nie kombinuj z pip!** Load automatycznie wykrywa i instaluje z różnych źródeł - PyPI, GitHub, GitLab, prywatne rejestry, URL, lokalne pliki.
 

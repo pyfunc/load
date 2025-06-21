@@ -13,7 +13,8 @@ Load's auto-print feature provides automatic, intelligent display of loaded modu
 
 ## Overview
 
-The auto-print functionality automatically displays information about loaded modules and objects, making it easier to work interactively. It's designed to be helpful without being intrusive.
+The auto-print functionality automatically displays information about loaded modules and objects, making it easier to work interactively. 
+It's designed to be helpful without being intrusive.
 
 ## Basic Usage
 
