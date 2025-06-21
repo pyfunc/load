@@ -1,7 +1,3 @@
-# 🔥 Load - Import z wieloma rejestrami
-# README.md
-
-```markdown
 # 🔥 Load - Modern Python Import Alternative
 
 Load is a modern alternative to Python's `import` system, inspired by the simplicity of Go and Groovy. It provides automatic package installation, intelligent caching, and magic import syntax.
@@ -45,9 +41,6 @@ For detailed documentation, please refer to:
 
 We welcome contributions! Please see [CONTRIBUTING.md](https://github.com/pyfunc/load/blob/main/CONTRIBUTING.md) for guidelines.
 
-## 📄 License
-
-MIT License - see LICENSE file for details.
 
 ## 🔗 Links
 
