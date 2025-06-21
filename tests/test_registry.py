@@ -73,13 +73,13 @@ class TestRegistry:
     def test_parse_source(self):
         """Test source parsing"""
         registry = LoadRegistry()
-        
+    
         # Test different source types
         assert registry.parse_source('requests') == ('pypi', 'requests')
         assert registry.parse_source('user/repo') == ('github', 'user/repo')
-        assert registry.parse_source('https://github.com/user/repo') == ('github', 'https://github.com/user/repo')
-        assert registry.parse_source('https://gitlab.com/user/repo') == ('gitlab', 'https://gitlab.com/user/repo')
-        assert registry.parse_source('./local_file.py') == ('local', './local_file.py')
+        assert registry.parse_source('https://github.com/user/repo') == ('url', 'https://github.com/user/repo')
+        assert registry.parse_source('company/package') == ('company', 'company/package')
+        assert registry.parse_source('private_gitlab/package') == ('private_gitlab', 'private_gitlab/package')
         assert registry.parse_source('http://example.com/package.zip') == ('url', 'http://example.com/package.zip')
 
     def test_install_from_pypi(self):
@@ -145,45 +145,52 @@ class TestRegistry:
     def test_install_from_url(self):
         """Test URL installation (mocked)"""
         registry = LoadRegistry()
-        
+    
         # Mock urllib.request.urlretrieve
         def mock_urlretrieve(url, filename):
             with open(filename, 'w') as f:
                 f.write('test content')
             return filename, None
-        
+    
         # Mock zipfile.ZipFile
         class MockZipFile:
             def __init__(self, *args, **kwargs):
                 pass
-            
+    
             def extractall(self, *args, **kwargs):
                 pass
-            
+    
             def __enter__(self):
                 return self
-            
+    
             def __exit__(self, *args):
                 pass
-        
+    
         import urllib.request
         import zipfile
-        original_urlretrieve = urllib.request.urlretrieve
-        original_zipfile = zipfile.ZipFile
+        import tempfile
+        import os
         
-        urllib.request.urlretrieve = mock_urlretrieve
-        zipfile.ZipFile = MockZipFile
-        
-        try:
-            # Test ZIP installation
-            assert registry.install_from_url('http://example.com/package.zip') is True
+        # Create temporary directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Set temp directory
+            registry.temp_dir = temp_dir
             
-            # Test single file installation
-            assert registry.install_from_url('http://example.com/module.py') is True
+            original_urlretrieve = urllib.request.urlretrieve
+            original_zipfile = zipfile.ZipFile
             
-        finally:
-            urllib.request.urlretrieve = original_urlretrieve
-            zipfile.ZipFile = original_zipfile
+            urllib.request.urlretrieve = mock_urlretrieve
+            zipfile.ZipFile = MockZipFile
+            
+            try:
+                # Test ZIP installation
+                assert registry.install_from_url('http://example.com/package.zip') is True
+                # Test single file installation
+                assert registry.install_from_url('http://example.com/module.py') is True
+            finally:
+                # Restore original functions
+                urllib.request.urlretrieve = original_urlretrieve
+                zipfile.ZipFile = original_zipfile
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

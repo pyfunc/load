@@ -1,44 +1,66 @@
 """
-Shortcuts for popular libraries
+Shortcut functions for common packages
 """
 
 from .core import load
 
-def requests():
-    return load("requests")
+# Shortcut functions
+def load_pandas(alias='pd'):
+    """Shortcut for loading pandas"""
+    return load('pandas', alias=alias)
 
-def numpy():
-    return load("numpy")
+def load_numpy(alias='np'):
+    """Shortcut for loading numpy"""
+    return load('numpy', alias=alias)
 
-def pandas():
-    return load("pandas")
+def load_requests():
+    """Shortcut for loading requests"""
+    return load('requests')
 
-def matplotlib():
-    return load("matplotlib")
+def load_json():
+    """Shortcut for loading json"""
+    return load('json')
 
-def torch():
-    return load("torch")
+def load_os():
+    """Shortcut for loading os"""
+    return load('os')
 
-def tensorflow():
-    return load("tensorflow")
+def load_sys():
+    """Shortcut for loading sys"""
+    return load('sys')
 
-def cv2():
-    return load("opencv-python", "cv2")
+def load_torch():
+    """Shortcut for loading torch"""
+    return load('torch')
 
-def PIL():
-    return load("pillow", "PIL")
+def load_cv2():
+    """Shortcut for loading OpenCV"""
+    return load('opencv-python', alias='cv2')
 
-def sklearn():
-    return load("scikit-learn", "sklearn")
+def load_pil():
+    """Shortcut for loading PIL"""
+    return load('pillow', alias='PIL')
+
+def load_sklearn():
+    """Shortcut for loading scikit-learn"""
+    return load('scikit-learn', alias='sklearn')
+
+def load_matplotlib(alias='plt'):
+    """Shortcut for loading matplotlib"""
+    return load('matplotlib', alias=alias)
 
 # Aliases
 def np():
-    return load("numpy", "np")
+    """Alias for numpy"""
+    return load_numpy()
 
 def pd():
-    return load("pandas", "pd")
+    """Alias for pandas"""
+    return load_pandas()
 
 def plt():
+    """Alias for matplotlib"""
+    return load_matplotlib()
     return load("matplotlib.pyplot", "plt")
 
 def tf():

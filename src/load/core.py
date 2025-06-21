@@ -2,6 +2,8 @@
 Core functionality of Load
 """
 
+from typing import Dict, Any
+from .config import _module_cache, AUTO_PRINT, PRINT_LIMIT, PRINT_TYPES
 from .utils import load, smart_print, install_package
 
 def load_github(repo: str, alias: str = None) -> Any:

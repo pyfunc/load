@@ -57,13 +57,22 @@ class LoadRegistry:
         """Parse package source"""
         if '://' in name:
             return 'url', name
-        elif '/' in name and ('github.com' in name or name.count('/') >= 1):
-            if 'github.com' in name:
+        elif '/' in name:
+            parts = name.split('/')
+            # Check if the first part is a known private registry
+            if parts[0] in PRIVATE_REGISTRIES:
+                return parts[0], name
+            # Check for GitHub/GitLab URLs
+            elif 'github.com' in name:
                 return 'github', name
             elif 'gitlab.com' in name:
                 return 'gitlab', name
-            else:
+            # Default to GitHub for user/repo format
+            elif len(parts) == 2 and '.' not in parts[0]:
                 return 'github', name
+            else:
+                # If not matched above, treat as PyPI package with slash in name
+                return 'pypi', name
         elif name.endswith('.py') or name.startswith('./') or name.startswith('../'):
             return 'local', name
         else:
@@ -115,42 +124,61 @@ class LoadRegistry:
 
     @staticmethod
     def install_from_url(url: str) -> bool:
-        """Download and install from URL"""
+        """Install from URL"""
         print(f"📦 Downloading from URL: {url}")
-
         try:
+            # Create a temporary directory
             with tempfile.TemporaryDirectory() as temp_dir:
                 if url.endswith('.zip'):
-                    zip_path = Path(temp_dir) / "package.zip"
-                    urllib.request.urlretrieve(url, zip_path)
-
-                    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                    # Download the file
+                    filename = os.path.join(temp_dir, 'package.zip')
+                    urllib.request.urlretrieve(url, filename)
+                    
+                    # Extract the archive
+                    with zipfile.ZipFile(filename, 'r') as zip_ref:
                         zip_ref.extractall(temp_dir)
-
+                    
+                    # Look for setup.py in the extracted files
                     for root, dirs, files in os.walk(temp_dir):
                         if 'setup.py' in files:
-                            cmd = [sys.executable, "-m", "pip", "install", root]
-                            result = subprocess.run(cmd, capture_output=True)
-                            return result.returncode == 0
-
-                elif url.endswith('.py'):
-                    file_path = Path(temp_dir) / "module.py"
-                    urllib.request.urlretrieve(url, file_path)
-
-                    import site
-                    user_site = site.getusersitepackages()
-                    os.makedirs(user_site, exist_ok=True)
-
-                    module_name = Path(url).stem
-                    target_path = Path(user_site) / f"{module_name}.py"
-                    file_path.rename(target_path)
+                            # Install the package
+                            subprocess.run(
+                                [sys.executable, 'setup.py', 'install'],
+                                cwd=root,
+                                check=True
+                            )
+                            return True
+                    
+                    # If no setup.py found, try installing directly with pip
+                    subprocess.run(
+                        [sys.executable, '-m', 'pip', 'install', temp_dir],
+                        check=True
+                    )
                     return True
-
+                    
+                elif url.endswith('.py'):
+                    # Handle single Python file
+                    file_path = os.path.join(temp_dir, 'module.py')
+                    urllib.request.urlretrieve(url, file_path)
+                    
+                    # Install the module
+                    subprocess.run(
+                        [sys.executable, '-m', 'pip', 'install', file_path],
+                        check=True
+                    )
+                    return True
+                    
+                else:
+                    # Try to install directly with pip
+                    subprocess.run(
+                        [sys.executable, '-m', 'pip', 'install', url],
+                        check=True
+                    )
+                    return True
+                    
         except Exception as e:
-            print(f"❌ Error downloading from URL: {e}")
+            print(f"❌ Error installing from URL: {e}")
             return False
-
-        return False
 
 def add_registry(name: str, config: dict):
     """Add new registry"""
