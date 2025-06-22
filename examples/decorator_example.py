@@ -6,10 +6,10 @@ dependencies for specific functions.
 """
 
 # Import the decorator (aliased to 'load' for convenience)
-from load import load_decorator as load
+from load import load_decorator, load, enable_auto_print, disable_auto_print, set_print_limit, smart_print, test_cache_info as cache_info
 
 # Example 1: Basic usage with numpy and pandas
-@load('numpy', 'pandas')
+@load_decorator('numpy', 'pandas', silent=True)
 def analyze_data():
     """Example function that uses numpy and pandas.
     
@@ -28,7 +28,7 @@ def analyze_data():
     return df
 
 # Example 2: Using aliases for cleaner code
-@load('np=numpy', 'plt=matplotlib.pyplot')
+@load_decorator('np=numpy', 'plt=matplotlib.pyplot', silent=True)
 def plot_sine_wave():
     """Example function that uses numpy and matplotlib with aliases."""
     print("📈 Plotting a sine wave...")
@@ -45,7 +45,7 @@ def plot_sine_wave():
     print("✅ Plot saved as 'sine_wave.png'")
 
 # Example 3: Using multiple dependencies with silent mode
-@load('requests', 'json', silent=True)
+@load_decorator('requests', 'json', silent=True)
 def fetch_data(url):
     """Example function that fetches and processes JSON data."""
     print(f"🌐 Fetching data from {url}...")

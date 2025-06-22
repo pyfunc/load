@@ -12,7 +12,15 @@ from pathlib import Path
 # Add parent directory to path to allow importing from src
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-import load  # noqa: E402
+from load import (
+    load,
+    enable_auto_print,
+    disable_auto_print,
+    set_print_limit,
+    smart_print,
+    info,
+    PRINT_LIMIT
+)
 
 # Constants
 DEFAULT_PRINT_LIMIT = 50  # Default number of items to show in truncated output
@@ -28,42 +36,40 @@ def auto_print_examples() -> None:
     print("=" * 50)
 
     # Enable auto-print
-    load.enable_auto_print()
+    enable_auto_print()
 
     # This should auto-print module info
     print("\n📦 Loading with auto-print enabled:")
-    # Import the module - this will auto-print
-    import json as _json  # noqa: F401
-
-    version = _json.__version__ if hasattr(_json, "__version__") else "unknown"
+    json_lib = load('json')
+    version = json_lib.__version__ if hasattr(json_lib, "__version__") else "unknown"
     print(f"✅ JSON module loaded (version: {version})")
 
     # Change print limit
     print("\n📏 Changing print limit:")
-    load.set_print_limit(DEFAULT_PRINT_LIMIT)
+    set_print_limit(50)  # Show only first 50 characters
+    print(f"📏 Print limit: {PRINT_LIMIT} characters")
 
-    # Import another module - this will auto-print
-    import os as _os  # noqa: F401
-
-    print(f"✅ OS module loaded (cwd: {_os.getcwd()})")
+    # This should respect the new print limit
+    os_lib = load('os')
+    cwd = os_lib.getcwd()
+    print(f"✅ OS module loaded (cwd: {cwd})")
 
     # Disable auto-print
     print("\n🔇 Disabling auto-print:")
-    load.disable_auto_print()
+    disable_auto_print()
 
-    # This should be silent - we just want to test the import
-    import sys as _  # noqa: F401, F841
-
+    # This should not print anything
+    load('time', silent=True)
     print("✅ Silent loading completed")
 
-    # Re-enable for final test
+    # Re-enable auto-print
     print("\n🔊 Re-enabling auto-print:")
-    load.enable_auto_print()
+    enable_auto_print()
 
-    # Final test - import time module (should auto-print)
-    import time as _time  # noqa: F401
-
-    print(f"✅ Time module loaded (current time: {_time.ctime()})")
+    # This should print again
+    time_lib = load('time')
+    current_time = time_lib.ctime()
+    print(f"✅ Time module loaded (current time: {current_time})")
 
     print("\n✅ Auto-print examples completed")
 
@@ -75,8 +81,6 @@ def test_smart_print() -> None:
     including strings, lists, dictionaries, and modules.
     """
     print("\n🧠 Testing smart print:")
-
-    from load.core import smart_print
 
     # Test different object types
     print("\n📝 Testing different object types:")
@@ -115,7 +119,7 @@ def test_cache_info() -> None:
             print(f"Warning: Failed to load {module_name}")
 
     # Get cache info
-    cache_info = load.info()
+    cache_info = info()
 
     print("📊 Cache Statistics:")
     print(f"   Total cached modules: {cache_info['cache_size']}")
@@ -136,31 +140,27 @@ def demo_real_usage() -> None:
     """
     print("\n🌍 Real-world usage demo:")
 
-    import load
-
     # Enable auto-print for demo
-    load.enable_auto_print()
+    enable_auto_print()
 
     print("\n1️⃣  Data analysis simulation:")
     # Simulate data analysis workflow
-    import json as json_lib
-
+    json_lib = load('json')
     data = {"sales": [100, 200, 150], "months": ["Jan", "Feb", "Mar"]}
     json_str = json_lib.dumps(data)
     print(f"   JSON data: {json_str[:50]}...")
 
     print("\n2️⃣  File operations simulation:")
-    import os as os_lib
-
+    os_lib = load('os')
     current_path = os_lib.getcwd()
     print(f"   Current directory: {Path(current_path).name}")
 
     print("\n3️⃣  System information:")
-    import sys as _  # noqa: F401, F841
+    sys_lib = load('sys')  # noqa: F401, F841
 
-    version = f"{_.version_info.major}.{_.version_info.minor}"
+    version = f"{sys_lib.version_info.major}.{sys_lib.version_info.minor}"
     print(f"   Python version: {version}")
-    print(f"   Platform: {_.platform}")
+    print(f"   Platform: {sys_lib.platform}")
 
     print("\n✅ Real-world demo completed")
 

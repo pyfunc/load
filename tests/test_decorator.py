@@ -2,6 +2,7 @@
 
 import os
 import sys
+import pytest
 from unittest.mock import patch
 
 # Add src to path
@@ -10,12 +11,19 @@ src_dir = os.path.abspath(
 )
 sys.path.insert(0, src_dir)
 
-# Import the module and patch the load function
-with patch('load.core.load') as mock_load:
-    # Import the decorator after patching
-    from load import load_decorator as load
-    # Store the mock for use in tests
-    core_load = mock_load
+# Import the module
+import load
+
+# Create a mock for the load function
+from unittest.mock import MagicMock
+core_load = MagicMock()
+core_load.return_value = 'mocked_module'
+
+# Import the decorator directly to avoid import issues
+from load import load_decorator as original_load_decorator
+
+# Create a wrapped version that uses our mock
+load_decorator = lambda *args, **kwargs: original_load_decorator(*args, **kwargs, load_func=core_load)
 
 
 class TestLoadDecorator:
@@ -26,7 +34,7 @@ class TestLoadDecorator:
         core_load.reset_mock()
         core_load.return_value = 'mocked_module'
 
-        @load.load_decorator('numpy', 'pandas')
+        @load_decorator('numpy', 'pandas')
         def test_func():
             return 'success'
 
@@ -40,7 +48,7 @@ class TestLoadDecorator:
         core_load.reset_mock()
         core_load.return_value = 'mocked_module'
 
-        @load.load_decorator('np=numpy', 'pd=pandas')
+        @load_decorator('np=numpy', 'pd=pandas')
         def test_func():
             return 'success'
 
@@ -54,7 +62,7 @@ class TestLoadDecorator:
         core_load.reset_mock()
         core_load.return_value = 'mocked_module'
 
-        @load.load_decorator('numpy', 'pandas', silent=True)
+        @load_decorator('numpy', 'pandas', silent=True)
         def test_func():
             return 'success'
 
@@ -67,7 +75,7 @@ class TestLoadDecorator:
         core_load.reset_mock()
         core_load.return_value = 'mocked_module'
 
-        @load.load_decorator('numpy')
+        @load_decorator('numpy')
         def test_func():
             return 'success'
 
@@ -86,7 +94,7 @@ class TestLoadDecorator:
         core_load.reset_mock()
         core_load.side_effect = ImportError("Test error")
 
-        @load.load_decorator('nonexistent_package')
+        @load_decorator('nonexistent_package')
         def test_func():
             return 'success'
 

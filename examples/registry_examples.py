@@ -5,6 +5,7 @@ Registry examples for Load
 import sys
 from pathlib import Path
 
+# Add parent directory to path to allow importing from src
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 
@@ -13,23 +14,23 @@ def registry_examples():
     print("🔧 Load Registry Examples")
     print("=" * 50)
 
-    import load
+    from load import load, info, test_cache_info as cache_info
 
-    # Test basic load functionality first
     print("\n📦 Testing basic loading:")
-    json_lib = load.load("json", silent=True)
+    json_lib = load('json')
     print("✅ JSON loaded successfully")
 
     # Test different source detection
     print("\n🎯 Testing source detection:")
 
     # Standard module
-    os_lib = load.load("os", silent=True)
+    os_lib = load('os')
     print("✅ Standard module (os) loaded")
 
     # Test local file loading (create a temp file)
     import tempfile
-
+    import importlib.util
+    
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write(
             """
@@ -40,22 +41,26 @@ def greet():
     return "Hello from temporary module!"
 """
         )
-        temp_path = f.name
+        temp_path = Path(f.name)
 
     try:
-        temp_module = load.load(temp_path, silent=True)
+        # Load the temporary module using importlib
+        spec = importlib.util.spec_from_file_location("temp_module", temp_path)
+        temp_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(temp_module)
+        
         print(f"✅ Local file loaded: {temp_module.TEST_VALUE}")
         print(f"✅ Function works: {temp_module.greet()}")
     except Exception as e:
         print(f"⚠️  Local file loading: {e}")
     finally:
-        Path(temp_path).unlink()
+        temp_path.unlink()
 
     # Show cache status
-    print(f"\n💾 Cache status:")
-    cache_info = load.info()
-    print(f"   Cached modules: {cache_info['cache_size']}")
-    print(f"   Module list: {cache_info['cached_modules']}")
+    print("\n💾 Cache status:")
+    cache_stats = info()
+    print(f"   Cached modules: {cache_stats['cache_size']}")
+    print(f"   Module list: {cache_stats['cached_modules']}")
 
     print("\n✅ Registry examples completed")
 

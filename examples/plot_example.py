@@ -8,7 +8,7 @@ if src_dir not in sys.path:
     sys.path.insert(0, src_dir)
 
 try:
-    from load import load
+    from load import load, enable_auto_print, disable_auto_print, set_print_limit, smart_print
     print("✅ Successfully imported load module")
 except ImportError as e:
     print(f"❌ Failed to import load module: {e}")

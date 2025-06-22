@@ -10,8 +10,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import sys
 import types
+import warnings
 from functools import wraps
-from typing import Any, Callable, TypeVar, cast
+from typing import Any, Callable, Dict, List, Optional, TypeVar, cast
 
 # Import only what we need from the compatibility layer
 from ._compat import import_module  # Used in _import_common_aliases
@@ -23,7 +24,7 @@ PY3 = not PY2
 # Type variable for generic function type
 F = TypeVar('F', bound=Callable[..., Any])
 
-# Import core functionality
+# Import core functionality and configuration
 from .core import (
     load_github,
     load_pypi,
@@ -35,13 +36,14 @@ from .core import (
     info as core_info,
     load,
 )
+from .config import PRINT_LIMIT, AUTO_PRINT, PRINT_TYPES
 
 __version__ = "1.0.0"
 __author__ = "Tom Sapletta"
 __email__ = "info@softreck.dev"
 
 # Import utility functions first to avoid circular imports
-from .utils import import_aliases
+from .utils import import_aliases, smart_print
 
 # Define __all__ after all imports to avoid circular imports
 __all__ = [
@@ -57,6 +59,10 @@ __all__ = [
     'load_decorator',
     'test_cache_info',
     'import_aliases',
+    'smart_print',
+    'PRINT_LIMIT',
+    'AUTO_PRINT',
+    'PRINT_TYPES',
 ]
 
 
@@ -372,44 +378,60 @@ new_module.info = core_info  # Use the already imported core_info
 
 # Add decorator and utility functions
 new_module.import_aliases = import_aliases  # Imported at the top
+new_module.smart_print = smart_print  # Re-export smart_print
+
+# Re-export config constants
+new_module.PRINT_LIMIT = PRINT_LIMIT
+new_module.AUTO_PRINT = AUTO_PRINT
+new_module.PRINT_TYPES = PRINT_TYPES
 
 # These will be added after their definitions
 # We'll use a simple approach to expose these functions
 
 
-def load_decorator(*modules: str, silent: bool = False) -> Callable[[F], F]:
+def load_decorator(*modules: str, silent: bool = False, load_func: Optional[Callable[..., Any]] = None) -> Callable[[F], F]:
     """Decorator to preload dependencies before function execution.
     
     Args:
         *modules: Module names to preload. Can include aliases using 'alias=module_name' syntax.
         silent: If True, suppresses import messages.
+        load_func: Optional function to use for loading modules (for testing).
         
     Returns:
-        A decorator that will preload the specified modules before function execution.
-        
-    Example:
-        @load_decorator('numpy', 'pandas')
-        def my_function():
-            # numpy and pandas are guaranteed to be available here
-            return np.array([1, 2, 3])
-            
-        @load_decorator('plt=matplotlib.pyplot', 'sns=seaborn')
-        def plot_data(data):
-            # plt and sns are available here
-            plt.figure()
-            sns.lineplot(data=data)
+        A decorator that will load the specified modules before function execution.
     """
+    # Use the provided load function or the default one
+    _load = load_func if load_func is not None else load
+    
+    # Track which modules we've already loaded
+    loaded_modules = set()
+    
     def decorator(func: F) -> F:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            # Preload all specified modules
+            nonlocal loaded_modules
+            
             for module_spec in modules:
-                if '=' in module_spec:
-                    alias, module_name = module_spec.split('=', 1)
-                    globals()[alias] = load(module_name, silent=silent)
-                else:
-                    load(module_spec, silent=silent)
+                if module_spec in loaded_modules:
+                    continue
+                    
+                try:
+                    if '=' in module_spec:
+                        alias, module_name = module_spec.split('=', 1)
+                        globals()[alias] = _load(module_name, silent=silent)
+                        loaded_modules.add(module_spec)
+                    else:
+                        _load(module_spec, silent=silent)
+                        loaded_modules.add(module_spec)
+                except ImportError as e:
+                    if not silent:
+                        print(f"Warning: Failed to load module: {e}")
+                    # Continue to the next module even if one fails
+                    continue
+            
+            # Execute the function regardless of whether all modules loaded successfully
             return func(*args, **kwargs)
+                
         return cast(F, wrapper)
     return decorator
 
