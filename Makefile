@@ -1,4 +1,4 @@
-.PHONY: help install test lint format build publish clean dev-setup
+.PHONY: help install test lint format build publish clean dev-setup examples
 
 help:
 	@echo "🔥 Load - Make commands"
@@ -16,6 +16,7 @@ help:
 	@echo ""
 	@echo "🧹 Utility commands:"
 	@echo "  clean       Clean build artifacts"
+	@echo "  examples    Run all example scripts"
 
 install:
 	poetry install
@@ -48,3 +49,23 @@ clean:
 
 dev-setup:
 	./scripts/dev_setup.sh
+
+examples:
+	@echo "🚀 Running all examples..."
+	@echo ""
+	@echo "1. Running basic_usage.py..."
+	@poetry run python examples/basic_usage.py
+	@echo ""
+	@echo "2. Running auto_print_examples.py..."
+	@poetry run python examples/auto_print_examples.py
+	@echo ""
+	@echo "3. Running decorator_example.py..."
+	@poetry run python examples/decorator_example.py
+	@echo ""
+	@echo "4. Running plot_example.py..."
+	@poetry run python examples/plot_example.py
+	@echo ""
+	@echo "5. Running registry_examples.py..."
+	@poetry run python examples/registry_examples.py
+	@echo ""
+	@echo "🎉 All examples completed successfully!"

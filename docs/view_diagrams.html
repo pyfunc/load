@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load Module - Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .mermaid {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        h1, h2, h3, h4 {
+            color: #333;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <!-- Content will be loaded here -->
+    </div>
+
+    <script>
+        // Load Markdown content
+        fetch('diagrams.md')
+            .then(response => response.text())
+            .then(markdown => {
+                // Convert Markdown to HTML (simple implementation)
+                const html = marked.parse(markdown);
+                document.getElementById('content').innerHTML = html;
+                
+                // Initialize Mermaid after content is loaded
+                mermaid.initialize({
+                    startOnLoad: true,
+                    theme: 'default',
+                    securityLevel: 'loose',
+                    flowchart: {
+                        useMaxWidth: true,
+                        htmlLabels: true,
+                        curve: 'basis'
+                    },
+                    themeCSS: `
+                        .node rect, .node circle, .node ellipse, .node polygon, .node path {
+                            fill: #e0f7fa;
+                            stroke: #00bcd4;
+                            stroke-width: 1px;
+                        }
+                        .edgePath path {
+                            stroke: #666;
+                            stroke-width: 1.5px;
+                        }
+                    `
+                });
+                
+                // Re-render Mermaid diagrams
+                mermaid.init(undefined, document.querySelectorAll('.language-mermaid'));
+            })
+            .catch(error => {
+                console.error('Error loading diagrams:', error);
+                document.getElementById('content').innerHTML = 
+                    '<h1>Error loading diagrams</h1><p>Could not load diagrams.md. Make sure you are serving this file from a web server.</p>';
+            });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>

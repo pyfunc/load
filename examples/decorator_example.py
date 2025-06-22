@@ -5,8 +5,14 @@ This example shows how to use the @load decorator to automatically handle
 dependencies for specific functions.
 """
 
+import sys
+from pathlib import Path
+
+# Add parent directory to path to allow importing from src
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
 # Import the decorator (aliased to 'load' for convenience)
-from load import load_decorator, load, enable_auto_print, disable_auto_print, set_print_limit, smart_print, test_cache_info
+from load import load_decorator, load, enable_auto_print, disable_auto_print, set_print_limit, smart_print, info
 
 # Example 1: Basic usage with numpy and pandas
 @load_decorator('numpy', 'pandas', silent=True)
@@ -15,8 +21,8 @@ def analyze_data():
     
     The @load decorator ensures these packages are available before execution.
     """
-    import numpy as np
-    import pandas as pd
+    np = load('numpy')
+    pd = load('pandas')
     
     print("🔍 Analyzing data with numpy and pandas...")
     data = np.random.rand(5, 3)
@@ -28,9 +34,15 @@ def analyze_data():
     return df
 
 # Example 2: Using aliases for cleaner code
-@load_decorator('np=numpy', 'plt=matplotlib.pyplot', silent=True)
+@load_decorator('numpy', 'matplotlib', silent=True)
 def plot_sine_wave():
     """Example function that uses numpy and matplotlib with aliases."""
+    # Use a non-interactive backend to avoid GUI issues
+    import matplotlib
+    matplotlib.use('Agg')  # Use the 'Agg' backend which doesn't require a display
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
     print("📈 Plotting a sine wave...")
     x = np.linspace(0, 10, 100)
     y = np.sin(x)
@@ -48,6 +60,8 @@ def plot_sine_wave():
 @load_decorator('requests', 'json', silent=True)
 def fetch_data(url):
     """Example function that fetches and processes JSON data."""
+    requests = load('requests')
+    json = load('json')
     print(f"🌐 Fetching data from {url}...")
     response = requests.get(url)
     data = response.json()
