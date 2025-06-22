@@ -10,13 +10,13 @@ The core feature of Load is its magic import system:
 import load
 
 # Standard library modules
-json_lib = load.json
-os_lib = load.os
-sys_lib = load.sys
+json_lib = load('json')
+os_lib = load('os')
+sys_lib = load('sys')
 
 # External packages (auto-install if available)
-requests_lib = load.requests  # Automatically installs requests
-pandas_lib = load.pd         # Automatically installs pandas
+requests_lib = load('requests')  # Automatically installs requests
+pandas_lib = load('pandas', alias='pd')  # Using alias for common import patterns
 ```
 
 ## 📁 Local File Loading
@@ -45,7 +45,7 @@ import load
 load.enable_auto_print()
 
 # Now loading shows information
-time_lib = load.time  # Output: ✅ time: module loaded
+time_lib = load('time')  # Output: ✅ time: module loaded
 
 # Control print verbosity
 load.set_print_limit(100)  # Set character limit
@@ -76,8 +76,8 @@ Load automatically installs missing packages when possible:
 import load
 
 # Automatically installs and loads packages
-requests_lib = load.requests  # Installs requests if not present
-numpy_lib = load.np           # Installs numpy if not present
+requests_lib = load('requests')  # Installs requests if not present
+numpy_lib = load('numpy', alias='np')  # Installs numpy if not present with alias
 ```
 
 ## 🛠️ Advanced Usage
@@ -96,7 +96,7 @@ load.configure_private_registry(
 )
 
 # Load from private registry
-company_lib = load.load("company/package-name")
+company_lib = load("company/package-name")
 ```
 
 ### Custom Aliases
