@@ -66,26 +66,32 @@ def greet():
 
 
 def test_magic_import():
-    """Test magic import functionality"""
-    print("\n🪄 Testing magic import:")
+    """Test module import functionality"""
+    print("\n📦 Testing module import:")
 
-    import load
+    from load import load
 
     try:
-        # Test magic import
-        json_via_magic = load.json
-        os_via_magic = load.os
-        sys_via_magic = load.sys
+        # Test module import using function call
+        json_module = load('json')
+        os_module = load('os')
+        sys_module = load('sys')
 
-        print("✅ Magic import works for stdlib modules")
+        # Verify the modules were loaded
+        assert json_module is not None, "Failed to load json module"
+        assert os_module is not None, "Failed to load os module"
+        assert sys_module is not None, "Failed to load sys module"
+        
+        print("✅ Module import works for stdlib modules")
 
-        # Test that they're the same as regular imports
-        json_regular = load.load("json", silent=True)
-        assert json_via_magic is json_regular, "Magic import should use same cache"
-        print("✅ Magic import uses same cache")
+        # Test that they're the same as cached imports
+        json_cached = load('json', silent=True)
+        assert json_module is json_cached, "Subsequent loads should return cached module"
+        print("✅ Module caching works correctly")
 
     except Exception as e:
-        print(f"❌ Magic import error: {e}")
+        print(f"❌ Module import error: {e}")
+        raise
 
 
 def test_error_handling():
