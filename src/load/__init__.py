@@ -324,12 +324,15 @@ def _import_common_aliases():
 
 # Create and configure the module wrapper
 module_wrapper = LoadModuleWrapper()
-module_wrapper.__file__ = _original_module.__file__ or __file__
-module_wrapper.__path__ = _original_module.__path__ or []  # type: ignore[assignment]
-module_wrapper.__package__ = _original_module.__package__ or __package__ or ""
-module_wrapper.__spec__ = _original_module.__spec__
-module_wrapper.__loader__ = _original_module.__loader__
-module_wrapper.__annotations__ = _original_module.__annotations__
+module_wrapper.__file__ = getattr(_original_module, '__file__', __file__)
+module_wrapper.__path__ = getattr(_original_module, '__path__', [])  # type: ignore[assignment]
+module_wrapper.__package__ = getattr(_original_module, '__package__', __package__ or "")
+module_wrapper.__loader__ = getattr(_original_module, '__loader__', None)
+
+# Python 3.4+ only attributes
+if sys.version_info >= (3, 4):
+    module_wrapper.__spec__ = getattr(_original_module, '__spec__', None)
+    module_wrapper.__annotations__ = getattr(_original_module, '__annotations__', {})
 
 # Create a new module and update it with our wrapper's attributes
 new_module = types.ModuleType(__name__)

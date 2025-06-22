@@ -1,11 +1,10 @@
+# -*- coding: utf-8 -*-
 """
 Configuration variables for Load
 """
 
-from typing import Dict, Any
-
 # Cache modułów w pamięci
-_module_cache: Dict[str, Any] = {}
+_module_cache = {}
 
 # Konfiguracja auto-print
 AUTO_PRINT = True

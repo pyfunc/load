@@ -2,13 +2,17 @@
 Tests for Load registry functionality
 """
 
-import pytest
 import os
 import sys
-from pathlib import Path
+import tempfile
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+src_dir = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..', 'src')
+)
+sys.path.insert(0, src_dir)
+
+import pytest  # noqa: E402
 
 from load.registry import LoadRegistry, REGISTRIES, PRIVATE_REGISTRIES
 from load.registry import list_registries, add_registry, configure_private_registry

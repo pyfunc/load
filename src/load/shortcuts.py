@@ -2,6 +2,8 @@
 Shortcut functions for common packages
 """
 
+import sys
+
 from .core import load
 
 
@@ -24,6 +26,76 @@ def load_requests(install=True, force=False, silent=False):
 def load_json(install=True, force=False, silent=False):
     """Shortcut for loading json"""
     return load("json", install=install, force=force, silent=silent)
+
+
+def load_yaml(install=True, force=False, silent=False):
+    """Shortcut for loading PyYAML"""
+    try:
+        import yaml
+        return yaml
+    except ImportError:
+        if install:
+            return load("pyyaml", install=install, force=force, silent=silent)
+        if not silent:
+            print("PyYAML not found. Install with: pip install pyyaml")
+        return None
+
+
+def load_pathlib(install=True, force=False, silent=False):
+    """Shortcut for loading pathlib (pathlib2 on Python 2)"""
+    if sys.version_info[0] < 3:
+        # Use pathlib2 for Python 2.7
+        try:
+            import pathlib2 as pathlib
+            return pathlib
+        except ImportError:
+            if install:
+                return load("pathlib2", install=install, force=force, silent=silent)
+            if not silent:
+                print("pathlib2 not found. Install with: pip install pathlib2")
+            return None
+    else:
+        # Use standard library pathlib for Python 3
+        try:
+            import pathlib
+            return pathlib
+        except ImportError:
+            if not silent:
+                print("pathlib not found in standard library (Python 3.4+ required)")
+            return None
+
+
+def load_random(install=True, force=False, silent=False):
+    """Shortcut for loading the random module"""
+    try:
+        import random
+        return random
+    except ImportError:
+        if not silent:
+            print("Failed to import random module from standard library")
+        return None
+
+
+def load_datetime(install=True, force=False, silent=False):
+    """Shortcut for loading the datetime module"""
+    try:
+        import datetime
+        return datetime
+    except ImportError:
+        if not silent:
+            print("Failed to import datetime module from standard library")
+        return None
+
+
+def load_time(install=True, force=False, silent=False):
+    """Shortcut for loading the time module"""
+    try:
+        import time
+        return time
+    except ImportError:
+        if not silent:
+            print("Failed to import time module from standard library")
+        return None
 
 
 def load_os(install=True, force=False, silent=False):

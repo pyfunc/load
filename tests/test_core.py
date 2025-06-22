@@ -2,13 +2,17 @@
 Tests for Load core functionality
 """
 
-import pytest
+import os
 import sys
 import tempfile
-from pathlib import Path
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+src_dir = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..', 'src')
+)
+sys.path.insert(0, src_dir)
+
+import pytest  # noqa: E402
 
 from load.core import load, _module_cache, info
 
@@ -74,9 +78,33 @@ def test_func():
             assert temp_module.TEST_VAR == "hello world"
             assert temp_module.test_func() == "test function"
 
+            # Test loading from relative path
+            test_dir = os.path.join(
+                os.path.dirname(__file__), "test_data"
+            )
+            test_file = os.path.join(test_dir, "test_module.py")
+
+            # Create test directory if it doesn't exist
+            if not os.path.exists(test_dir):
+                os.makedirs(test_dir)
+
+            with open(test_file, "w") as f:
+                f.write("def test_func(): return 'test'")
+
+            mod = load(test_file, silent=True)
+            assert hasattr(mod, "test_func")
+            assert mod.test_func() == "test"
+
+            # Cleanup
+            try:
+                os.remove(test_file)
+                os.rmdir(test_dir)
+            except OSError:
+                pass
+
         finally:
             # Clean up
-            Path(temp_path).unlink()
+            os.unlink(temp_path)
 
     def test_load_nonexistent_module(self):
         """Test loading nonexistent module without auto-install"""

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Registry management for Load
 """
@@ -290,11 +291,11 @@ def list_registries():
     print("🔧 Available registries:")
     print("\n📦 Public:")
     for name, config in REGISTRIES.items():
-        print(f"  {name}: {config['description']}")
+        print("  {0}: {1}".format(name, config['description']))
 
     print("\n🔒 Private:")
     for name, config in PRIVATE_REGISTRIES.items():
-        print(f"  {name}: {config['description']}")
+        print("  {0}: {1}".format(name, config['description']))
 
 
 def configure_private_registry(name, index_url=None, token=None, base_url=None):
