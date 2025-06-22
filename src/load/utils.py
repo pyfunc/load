@@ -4,8 +4,9 @@ Utility functions for Load
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import imp
-import importlib
+import importlib.util
+import importlib.machinery
+import importlib.abc
 import os
 import subprocess
 import sys
@@ -147,10 +148,18 @@ def _load_local_file(file_path, cache_key, silent=False):
     if not os.path.exists(file_path):
         raise ImportError("File {0} does not exist".format(file_path))
 
-    # For Python 2.7 compatibility, use imp.load_source
     try:
         module_name = os.path.splitext(os.path.basename(file_path))[0]
-        module = imp.load_source(module_name, file_path)
+        
+        # Use importlib to load the module
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        if spec is None:
+            raise ImportError("Could not load spec for {0}".format(file_path))
+            
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+        
         _module_cache[cache_key] = module
         if not silent:
             smart_print(module, cache_key)

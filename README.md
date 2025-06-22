@@ -10,6 +10,15 @@ Load simplifies Python imports by:
 - Improving developer productivity
 - Making imports more intuitive
 
+## ✨ Features
+
+- **Automatic Package Installation**: Missing packages are installed on demand
+- **Smart Caching**: Modules are cached for faster subsequent imports
+- **Magic Import Syntax**: Import with just the package name
+- **Function-level Imports**: Use `@load` decorator to manage dependencies at function level
+- **Multiple Registries**: Support for PyPI, GitHub, GitLab, and private registries
+- **Python 2/3 Compatible**: Works across Python versions
+
 ## 🚀 Quick Start
 
 Install load using any of these methods:
@@ -39,9 +48,39 @@ For detailed documentation, please refer to:
 - [🎯 Examples](https://github.com/pyfunc/load/tree/main/examples)
 - [📊 Diagrams](https://github.com/pyfunc/load/blob/main/docs/diagrams.md)
 
+## 🎯 Function-level Dependency Loading
+
+Use the `@load` decorator to automatically handle dependencies for specific functions:
+
+```python
+from load import load_decorator as load
+
+@load('numpy', 'pandas', 'plt=matplotlib.pyplot')
+def analyze_data():
+    import numpy as np
+    data = np.random.rand(10, 3)
+    plt.plot(data)
+    plt.show()
+
+# The required packages will be automatically installed when the function is first called
+analyze_data()
+```
+
+For more examples and advanced usage, see the [Decorator Documentation](docs/decorator_usage.md).
+
 ## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](https://github.com/pyfunc/load/blob/main/CONTRIBUTING.md) for guidelines.
+
+## 📚 Documentation Index
+
+- [📚 Installation Guide](docs/installation.md)
+- [💪 Usage Examples](docs/usage.md)
+- [🎯 Function-level Imports](docs/decorator_usage.md)
+- [📦 Features List](docs/features.md)
+- [🔧 API Reference](docs/api.md)
+- [🎯 Examples](examples/)
+- [📊 Diagrams](docs/diagrams.md)
 
 ## 🔗 Links
 

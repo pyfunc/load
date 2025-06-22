@@ -1,0 +1,76 @@
+"""
+Example demonstrating the @load decorator for function-level dependency management.
+
+This example shows how to use the @load decorator to automatically handle
+dependencies for specific functions.
+"""
+
+# Import the decorator (aliased to 'load' for convenience)
+from load import load_decorator as load
+
+# Example 1: Basic usage with numpy and pandas
+@load('numpy', 'pandas')
+def analyze_data():
+    """Example function that uses numpy and pandas.
+    
+    The @load decorator ensures these packages are available before execution.
+    """
+    import numpy as np
+    import pandas as pd
+    
+    print("🔍 Analyzing data with numpy and pandas...")
+    data = np.random.rand(5, 3)
+    df = pd.DataFrame(data, columns=['A', 'B', 'C'])
+    print("📊 Random DataFrame:")
+    print(df)
+    print("\n📈 Basic Statistics:")
+    print(df.describe())
+    return df
+
+# Example 2: Using aliases for cleaner code
+@load('np=numpy', 'plt=matplotlib.pyplot')
+def plot_sine_wave():
+    """Example function that uses numpy and matplotlib with aliases."""
+    print("📈 Plotting a sine wave...")
+    x = np.linspace(0, 10, 100)
+    y = np.sin(x)
+    
+    plt.figure(figsize=(8, 4))
+    plt.plot(x, y, 'b-', linewidth=2)
+    plt.title('Sine Wave Example')
+    plt.xlabel('x')
+    plt.ylabel('sin(x)')
+    plt.grid(True)
+    plt.savefig('sine_wave.png')
+    print("✅ Plot saved as 'sine_wave.png'")
+
+# Example 3: Using multiple dependencies with silent mode
+@load('requests', 'json', silent=True)
+def fetch_data(url):
+    """Example function that fetches and processes JSON data."""
+    print(f"🌐 Fetching data from {url}...")
+    response = requests.get(url)
+    data = response.json()
+    print(f"📥 Retrieved {len(data)} items")
+    return data
+
+if __name__ == "__main__":
+    print("🚀 Starting decorator examples...\n")
+    
+    # Example 1: Basic usage
+    print("=== Example 1: Basic Usage ===")
+    df = analyze_data()
+    
+    # Example 2: Using aliases
+    print("\n=== Example 2: Using Aliases ===")
+    plot_sine_wave()
+    
+    # Example 3: Fetching data
+    print("\n=== Example 3: Fetching Data ===")
+    try:
+        data = fetch_data('https://jsonplaceholder.typicode.com/todos/1')
+        print(f"📝 Todo item: {data['title']} (ID: {data['id']})")
+    except Exception as e:
+        print(f"❌ Error fetching data: {e}")
+    
+    print("\n✅ All examples completed!")

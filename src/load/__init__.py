@@ -10,6 +10,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import sys
 import types
+from functools import wraps
+from typing import Any, Callable, TypeVar, cast
 
 # Import only what we need from the compatibility layer
 from ._compat import import_module  # Used in _import_common_aliases
@@ -17,6 +19,9 @@ from ._compat import import_module  # Used in _import_common_aliases
 # For Python 2/3 compatibility
 PY2 = sys.version_info[0] == 2
 PY3 = not PY2
+
+# Type variable for generic function type
+F = TypeVar('F', bound=Callable[..., Any])
 
 from .core import (
     load_github,
@@ -29,6 +34,9 @@ from .core import (
     info as core_info,
     load,
 )
+
+# Type variable for generic function type
+F = TypeVar('F', bound=Callable[..., Any])
 
 
 __version__ = "1.0.0"
@@ -344,6 +352,72 @@ new_module.enable_auto_print = module_wrapper.enable_auto_print
 new_module.disable_auto_print = module_wrapper.disable_auto_print
 new_module.set_print_limit = module_wrapper.set_print_limit
 new_module.info = core_info  # Use the already imported core_info
+
+
+def load_decorator(*modules: str, silent: bool = False):
+    """Decorator to preload dependencies before function execution.
+    
+    Args:
+        *modules: Module names to preload. Can include aliases using 'alias=module_name' syntax.
+        silent: If True, suppresses import messages.
+        
+    Returns:
+        A decorator that will preload the specified modules before function execution.
+        
+    Example:
+        @load_decorator('numpy', 'pandas')
+        def my_function():
+            # numpy and pandas are guaranteed to be available here
+            return np.array([1, 2, 3])
+            
+        @load_decorator('plt=matplotlib.pyplot', 'sns=seaborn')
+        def plot_data(data):
+            # plt and sns are available here
+            plt.figure()
+            sns.lineplot(data=data)
+    """
+    def decorator(func: F) -> F:
+        @wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            # Preload all specified modules
+            for module_spec in modules:
+                if '=' in module_spec:
+                    alias, module_name = module_spec.split('=', 1)
+                    globals()[alias] = load(module_name, silent=silent)
+                else:
+                    load(module_name, silent=silent)
+            return func(*args, **kwargs)
+        return cast(F, wrapper)
+    return decorator
+
+
+def test_cache_info() -> None:
+    """Test and display cache information.
+
+    Shows how to retrieve and display information about the module cache,
+    including the number of cached modules and cache statistics.
+    """
+    print("\n🧪 Testing cache info...")
+
+    # Import several modules (won't auto-print due to silent=True)
+    modules = ["json", "os", "sys", "time", "math"]
+    for module_name in modules:
+        try:
+            __import__(module_name)
+        except ImportError:
+            print(f"Warning: Failed to load {module_name}")
+
+    # Get cache info
+    cache_info = core_info()
+
+    print("📊 Cache Statistics:")
+    print(f"   Total cached modules: {cache_info['cache_size']}")
+    print(f"   Auto-print enabled: {cache_info['auto_print']}")
+    print(f"   Print limit: {cache_info['print_limit']}")
+    cached = ", ".join(cache_info["cached_modules"])
+    print(f"   Cached modules: {cached}")
+
+    print("✅ Cache info test completed")
 
 
 def import_aliases(*names):
