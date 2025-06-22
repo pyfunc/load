@@ -6,7 +6,7 @@ dependencies for specific functions.
 """
 
 # Import the decorator (aliased to 'load' for convenience)
-from load import load_decorator, load, enable_auto_print, disable_auto_print, set_print_limit, smart_print, test_cache_info as cache_info
+from load import load_decorator, load, enable_auto_print, disable_auto_print, set_print_limit, smart_print, test_cache_info
 
 # Example 1: Basic usage with numpy and pandas
 @load_decorator('numpy', 'pandas', silent=True)

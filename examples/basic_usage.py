@@ -9,13 +9,14 @@ import types
 # Add src to path for development
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+# Import load functions
+from load import load, enable_auto_print, disable_auto_print, set_print_limit, smart_print
+
 
 def basic_examples():
     """Basic Load examples"""
     print("🔥 Load Basic Examples")
     print("=" * 50)
-
-    from load import load, enable_auto_print, disable_auto_print, set_print_limit, smart_print, test_cache_info
 
     # Load stdlib modules - these always work
     print("\n📚 Loading standard library modules:")
@@ -46,7 +47,14 @@ def basic_examples():
 
     # Show cache info
     print(f"\n💾 Cache info:")
-    cache_info()
+    from load import info
+    cache_info = info()
+    print(f"📊 Cache Statistics:")
+    print(f"   Total cached modules: {cache_info['cache_size']}")
+    print(f"   Auto-print enabled: {cache_info['auto_print']}")
+    print(f"   Print limit: {cache_info['print_limit']}")
+    cached = ", ".join(cache_info["cached_modules"])
+    print(f"   Cached modules: {cached}")
 
     print(f"\n✅ Basic examples completed successfully!")
 
@@ -87,7 +95,9 @@ def test_aliases():
     print("✅ Alias loading completed")
 
     # Check cache
-    load.test_cache_info()
+    from load import info
+    cache_info = info()
+    print(f"📊 Final cache info: {cache_info['cache_size']} modules cached")
 
 
 if __name__ == "__main__":

@@ -2,8 +2,7 @@
 Shortcut functions for common packages
 """
 
-import sys
-
+# Don't import sys at module level to avoid shadowing
 from .core import load
 
 
@@ -43,6 +42,7 @@ def load_yaml(install=True, force=False, silent=False):
 
 def load_pathlib(install=True, force=False, silent=False):
     """Shortcut for loading pathlib (pathlib2 on Python 2)"""
+    import sys  # Import here to avoid shadowing
     if sys.version_info[0] < 3:
         # Use pathlib2 for Python 2.7
         try:
@@ -61,8 +61,28 @@ def load_pathlib(install=True, force=False, silent=False):
             return pathlib
         except ImportError:
             if not silent:
-                print("pathlib not found in standard library (Python 3.4+ required)")
+                print("pathlib not found in standard library")
             return None
+
+
+def load_pil(install=True, force=False, silent=False):
+    """Shortcut for loading PIL"""
+    try:
+        from PIL import Image  # Import Image to ensure it's available
+        return Image  # Return the Image module directly
+    except ImportError:
+        if install:
+            try:
+                # Try to install and import again
+                import PIL.Image
+                return PIL.Image
+            except ImportError:
+                if not silent:
+                    print("Pillow not found. Install with: pip install pillow")
+                return None
+        if not silent:
+            print("Pillow not found. Install with: pip install pillow")
+        return None
 
 
 def load_random(install=True, force=False, silent=False):
@@ -105,7 +125,8 @@ def load_os(install=True, force=False, silent=False):
 
 def load_sys(install=True, force=False, silent=False):
     """Shortcut for loading sys"""
-    return load("sys", install=install, force=force, silent=silent)
+    import sys  # Import at function level to avoid circular import
+    return sys  # Just return the built-in sys module
 
 
 def load_torch(install=True, force=False, silent=False):
@@ -226,7 +247,3 @@ requests = load_requests
 json = load_json
 os = load_os
 sys = load_sys
-
-
-def sys():
-    return load("sys")

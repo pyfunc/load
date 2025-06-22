@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "load"
-version = "1.0.11"
+version = "1.0.13"
 description = "Modern alternative to Python import - inspired by Go and Groovy. Compatible with Python 2.7 and 3.5+."
 authors = ["Tom Sapletta <info@softreck.dev>"]
 license = "Apache-2.0"
