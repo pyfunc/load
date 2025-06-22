@@ -1,6 +1,14 @@
-# Auto-Print Functionality
+# 📝 Auto-Print Functionality
 
-Load's auto-print feature provides automatic, intelligent display of loaded modules and objects, similar to Jupyter's rich output but working in any Python environment.
+Load's auto-print feature provides automatic, intelligent display of loaded modules and objects, similar to Jupyter's rich output but working in any Python environment. This feature is particularly useful for interactive development and debugging.
+
+## 🚀 Key Features
+
+- Automatic display of module information on import
+- Smart formatting for different data types
+- Configurable output limits
+- Works in any Python environment (not just Jupyter)
+- Customizable display options
 
 ## Table of Contents
 - [Overview](#overview)
@@ -16,95 +24,139 @@ Load's auto-print feature provides automatic, intelligent display of loaded modu
 The auto-print functionality automatically displays information about loaded modules and objects, making it easier to work interactively. 
 It's designed to be helpful without being intrusive.
 
-## Basic Usage
+## 🏁 Basic Usage
 
-Auto-print is enabled by default. When you import and use Load, it will automatically display information about loaded modules:
+Auto-print is enabled by default. Here's how to use it:
 
 ```python
 # Import Load (auto-print is enabled by default)
 import load
 
-# Load modules - they will auto-print information
-import numpy as np
-import pandas as pd
+# Standard imports with auto-print
+numpy = load('numpy')  # Shows module information
+pandas = load('pandas', alias='pd')  # With alias
 
-# Load with aliases (also auto-printed)
-np = load.np  # Same as import numpy as np
-pd = load.pd  # Same as import pandas as pd
+# Standard imports also work
+import json  # Will show module info if auto-print is enabled
+
+# Load multiple modules
+load('os', 'sys', 'math')  # Shows info for each module
 ```
 
-## Configuration
+## ⚙️ Configuration
 
-You can control the auto-print behavior with these functions:
-
-```python
-from load import enable_auto_print, disable_auto_print, set_print_limit
-
-# Enable auto-print (enabled by default)
-enable_auto_print()
-
-# Disable auto-print
-disable_auto_print()
-
-# Set the maximum number of characters to print
-set_print_limit(2000)  # Default is 1000
-```
-
-## Smart Printing
-
-The auto-print feature includes intelligent display for various types of objects:
-
-- **Modules**: Shows basic module information
-- **DataFrames/Arrays**: Displays shape and preview
-- **HTTP Responses**: Shows status code and URL
-- **Collections**: Shows length and first few items
-- **Custom Objects**: Displays available attributes
-
-## Customization
-
-### Print Limit
-
-Control how much information is displayed:
-
-```python
-from load import set_print_limit
-
-# Show more output
-set_print_limit(5000)  # Increase to 5000 characters
-
-# Show less output
-set_print_limit(500)   # Decrease to 500 characters
-```
-
-### Selective Auto-Print
-
-You can temporarily disable auto-print for specific imports:
-
-```python
-# Temporarily disable auto-print
-from load import disable_auto_print, enable_auto_print
-
-disable_auto_print()
-import some_heavy_module  # Won't auto-print
-enable_auto_print()
-```
-
-## Examples
-
-### Basic Usage
+Control the auto-print behavior with these functions:
 
 ```python
 import load
 
-# These will auto-print
-import requests
-import numpy as np
-import pandas as pd
+# Check current auto-print status
+print(f"Auto-print enabled: {load.info().get('auto_print', False)}")
 
-# HTTP requests
-response = requests.get('https://api.github.com')
-# Prints: Response 200 - https://api.github.com
-#         JSON: {'current_user_url': 'https://api.github.com/user', ...}
+# Enable auto-print with custom settings
+load.enable_auto_print(limit=1500)  # Set character limit to 1500
+
+# Disable auto-print
+load.disable_auto_print()
+
+# Change print limit without toggling
+load.set_print_limit(2000)  # Increase to 2000 characters
+
+# Get current print limit
+current_limit = load.info().get('print_limit', 1000)
+```
+
+## 🧠 Smart Printing
+
+The auto-print feature includes intelligent display for various types of objects:
+
+| Object Type | Display Information | Example |
+|-------------|---------------------|---------|
+| **Modules** | Name, version, location | `✅ numpy v1.21.0` |
+| **DataFrames** | Shape, columns, first 5 rows | `DataFrame[5x3]` |
+| **NumPy Arrays** | Shape, dtype, sample values | `array[1000x1000] float64` |
+| **HTTP Responses** | Status code, URL, headers | `200 OK https://api.example.com` |
+| **Collections** | Length, first few items | `list[1000] [1, 2, 3, ...]` |
+| **Custom Objects** | Available attributes | `CustomObject(attr1, method1, ...)` |
+
+### Customizing Display
+
+You can customize how objects are displayed by implementing the `__load_display__` method in your classes:
+
+```python
+class CustomData:
+    def __init__(self, data):
+        self.data = data
+    
+    def __load_display__(self):
+        return f"CustomData with {len(self.data)} items"
+
+# When loaded:
+# ✅ CustomData with 42 items
+```
+
+## 🎨 Advanced Customization
+
+### Context Manager for Temporary Changes
+
+Use a context manager to temporarily modify auto-print settings:
+
+```python
+import load
+
+with load.no_print():
+    # Auto-print is disabled in this block
+    import heavy_module  # No output
+    
+# Auto-print is automatically restored here
+import another_module  # Will show output
+
+# You can also use it to change settings temporarily
+with load.print_settings(limit=500):
+    # Temporary settings apply here
+    pass
+```
+
+### Custom Print Handlers
+
+Register custom handlers for specific types:
+
+```python
+import load
+
+def custom_printer(obj, print_fn):
+    if hasattr(obj, 'custom_display'):
+        print_fn(f"✨ {obj.custom_display()}")
+        return True
+    return False
+
+# Register the custom printer
+load.register_printer(custom_printer)
+```
+
+### Environment Variables
+
+Control auto-print behavior with environment variables:
+
+```bash
+# Disable auto-print by default
+export LOAD_AUTO_PRINT=0
+
+# Set default print limit
+export LOAD_PRINT_LIMIT=2000
+```
+
+## 🚀 Examples
+
+### Basic Interactive Usage
+
+```python
+import load
+
+# Enable auto-print if not already enabled
+load.enable_auto_print()
+
+# Standard library imports
 
 # DataFrames
 df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})

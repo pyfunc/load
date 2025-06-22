@@ -2,14 +2,36 @@
 
 ## 📚 Main Functions
 
-### `load.load(name, alias=None, install=True, force=False)`
+### `load(name, alias=None, install=True, force=False)`
+
+The main function to load modules. Can be used directly or as a callable.
+
+```python
+# These are equivalent
+import load
+json1 = load('json')
+json2 = load.load('json')
+```
 
 Load a module with various options:
 
-- `name`: Module name or path
-- `alias`: Optional alias for the module
-- `install`: Whether to install if not found
-- `force`: Force reload from source
+- `name` (str): Module name or path
+- `alias` (str, optional): Alias to use for the module
+- `install` (bool): Whether to install if not found (default: True)
+- `force` (bool): Force reload from source (default: False)
+- `**kwargs`: Additional arguments passed to the underlying import system
+
+### `__call__(name, alias=None, install=True, force=False, **kwargs)`
+
+Makes the module callable, equivalent to `load()`. This allows using the module directly as a function.
+
+```python
+import load
+
+# These are equivalent
+json1 = load('json')
+json2 = load.load('json')
+```
 
 ```python
 import load
@@ -24,80 +46,198 @@ pd = load.load('pandas', alias='pd')
 fresh_module = load.load('module', force=True)
 ```
 
-### `load.info()`
+### `info()`
 
-Get information about the current state:
+Get information about the current state, including cache status and loaded modules.
 
 ```python
 info = load.info()
 print(f"Cached modules: {info['cache_size']}")
 print(f"Modules: {info['cached_modules']}")
+
+# Example output:
+# {
+#   'cache_size': 5,
+#   'cached_modules': ['os', 'sys', 'json', 'pandas', 'numpy'],
+#   'auto_print': True,
+#   'print_limit': 1000
+# }
 ```
 
-### `load.enable_auto_print()`
+### `enable_auto_print(limit=1000)`
 
-Enable automatic result display:
+Enable automatic result display with optional character limit.
 
 ```python
+# Enable with default 1000 character limit
 load.enable_auto_print()
+
+# Or specify a custom limit
+load.enable_auto_print(limit=500)
 ```
 
-### `load.disable_auto_print()`
+### `disable_auto_print()`
 
-Disable automatic result display:
+Disable automatic result display.
 
 ```python
 load.disable_auto_print()
 ```
 
-### `load.set_print_limit(limit)`
+### `set_print_limit(limit)`
 
-Set character limit for auto-print:
+Set character limit for auto-print output.
 
 ```python
-load.set_print_limit(1000)
+load.set_print_limit(1000)  # Show up to 1000 characters
 ```
 
-### `load.configure_private_registry(name, index_url)`
+### `configure_private_registry(name, index_url, **kwargs)`
 
-Configure private package registry:
+Configure a private package registry.
 
 ```python
 load.configure_private_registry(
-    "company",
-    index_url="https://pypi.company.com/simple/"
+    name="company",
+    index_url="https://pypi.company.com/simple/",
+    # Optional authentication
+    username="user",
+    password="pass"
 )
 ```
 
-## 📦 Registry Functions
+Parameters:
+- `name` (str): Registry name
+- `index_url` (str): Base URL of the package index
+- `**kwargs`: Additional arguments passed to pip's install command
 
-### `load.add_registry(name, url)`
+## 📦 Registry Management
 
-Add a new package registry:
+### `add_registry(name, url, **kwargs)`
+
+Add a new package registry with optional authentication.
 
 ```python
+# Basic usage
 load.add_registry("github", "https://github.com")
+
+
+# With authentication
+load.add_registry(
+    "private",
+    "https://private.pypi.org/simple/",
+    username="user",
+    password="pass"
+)
 ```
 
-### `load.remove_registry(name)`
+### `remove_registry(name)`
 
-Remove a registry:
+Remove a configured registry.
 
 ```python
 load.remove_registry("github")
 ```
 
-### `load.list_registries()`
+### `list_registries()`
 
-List all configured registries:
+List all configured registries and their configurations.
 
 ```python
 registries = load.list_registries()
+# Returns: [{'name': 'pypi', 'url': 'https://pypi.org/simple'}, ...]
 ```
 
-## 🛠️ Configuration Functions
+## 🛠️ Configuration
 
-### `load.set_cache_size(size)`
+### `set_cache_size(size)`
+
+Set the maximum number of modules to keep in the cache.
+
+```python
+load.set_cache_size(100)  # Keep up to 100 modules in cache
+```
+
+### `clear_cache()`
+
+Clear all cached modules.
+
+```python
+load.clear_cache()
+```
+
+### `install(package, version=None, upgrade=False, **kwargs)`
+
+Install a package programmatically.
+
+```python
+# Basic installation
+load.install('requests')
+
+
+# Specific version
+load.install('numpy', '1.21.0')
+
+
+# Upgrade existing package
+load.install('pandas', upgrade=True)
+
+
+# With additional pip options
+load.install('private-package', \
+    index_url='https://pypi.company.com/simple/',
+    extra_index_url='https://pypi.org/simple/'
+)
+```
+
+### `uninstall(package, **kwargs)`
+
+Uninstall a package.
+
+```python
+load.uninstall('package-name')
+```
+
+## 🔍 Utility Functions
+
+### `is_installed(package)`
+
+Check if a package is installed.
+
+```python
+if load.is_installed('numpy'):
+    print('NumPy is installed')
+```
+
+### `get_version(package)`
+
+Get the installed version of a package.
+
+```python
+version = load.get_version('numpy')
+print(f'NumPy version: {version}')
+```
+
+## 🎯 Decorators
+
+### `@load_decorator(*packages, **options)`
+
+Decorator to automatically install and import packages before function execution.
+
+```python
+from load import load_decorator as load
+
+@load('numpy', 'pandas', alias={'pandas': 'pd'})
+def analyze_data():
+    import numpy as np
+    import pandas as pd
+    # Your code here
+```
+
+Options:
+- `alias`: Dict of package aliases
+- `silent`: Suppress output (default: False)
+- `force`: Force reinstallation (default: False)
 
 Set maximum cache size in bytes:
 
