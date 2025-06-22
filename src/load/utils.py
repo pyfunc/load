@@ -143,6 +143,41 @@ def load(
     raise ImportError("Cannot load {0}".format(name))
 
 
+def import_aliases(*names):
+    """Import multiple modules and return them as a tuple.
+
+    Args:
+        *names: Module names to import. Can include aliases using 'alias=module_name' syntax.
+
+    Returns:
+        A tuple containing the imported modules in the order they were requested.
+
+    Example:
+        # Import with default names
+        np, pd = import_aliases('numpy', 'pandas')
+
+        # Import with aliases
+        plt, sns = import_aliases('plt=matplotlib.pyplot', 'sns=seaborn')
+    """
+    result = []
+    for name in names:
+        if "=" in name:
+            alias, module_name = name.split("=", 1)
+        else:
+            module_name = name
+
+        try:
+            module = __import__(module_name.split(".")[0])
+            # Handle submodules (e.g., matplotlib.pyplot)
+            for part in module_name.split(".")[1:]:
+                module = getattr(module, part)
+            result.append(module)
+        except ImportError as e:
+            raise ImportError("Could not import {0}: {1}".format(module_name, e))
+
+    return tuple(result) if len(result) > 1 else result[0] if result else None
+
+
 def _load_local_file(file_path, cache_key, silent=False):
     """Load local Python file"""
     if not os.path.exists(file_path):

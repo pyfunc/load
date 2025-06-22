@@ -1,8 +1,26 @@
-from src.load.load import load
+import os
+import sys
 
-@load_decorator('np=numpy', 'pd=pandas', 'plt=matplotlib.pyplot')
+# Add the src directory to the Python path
+project_root = os.path.abspath(os.path.dirname(__file__))
+src_dir = os.path.join(project_root, '..', 'src')
+if src_dir not in sys.path:
+    sys.path.insert(0, src_dir)
+
+try:
+    from load import load
+    print("✅ Successfully imported load module")
+except ImportError as e:
+    print(f"❌ Failed to import load module: {e}")
+    sys.exit(1)
+
 def create_plot():
-    # Use the aliases directly
+    # Load the required modules
+    np = load('numpy')
+    pd = load('pandas')
+    plt = load('matplotlib.pyplot')
+    
+    # Use the loaded modules
     x = np.linspace(0, 10, 100)
     y = np.sin(x)
     

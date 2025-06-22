@@ -23,6 +23,7 @@ PY3 = not PY2
 # Type variable for generic function type
 F = TypeVar('F', bound=Callable[..., Any])
 
+# Import core functionality
 from .core import (
     load_github,
     load_pypi,
@@ -35,13 +36,28 @@ from .core import (
     load,
 )
 
-# Type variable for generic function type
-F = TypeVar('F', bound=Callable[..., Any])
-
-
 __version__ = "1.0.0"
 __author__ = "Tom Sapletta"
 __email__ = "info@softreck.dev"
+
+# Import utility functions first to avoid circular imports
+from .utils import import_aliases
+
+# Define __all__ after all imports to avoid circular imports
+__all__ = [
+    'load',
+    'load_github',
+    'load_pypi',
+    'load_url',
+    'load_local',
+    'enable_auto_print',
+    'disable_auto_print',
+    'set_print_limit',
+    'info',
+    'load_decorator',
+    'test_cache_info',
+    'import_aliases',
+]
 
 
 class LoadModule(object):
@@ -348,13 +364,20 @@ for key, value in module_wrapper.__dict__.items():
     setattr(new_module, key, value)
 
 # Add module-level functions
+# Add core module functions
 new_module.enable_auto_print = module_wrapper.enable_auto_print
 new_module.disable_auto_print = module_wrapper.disable_auto_print
 new_module.set_print_limit = module_wrapper.set_print_limit
 new_module.info = core_info  # Use the already imported core_info
 
+# Add decorator and utility functions
+new_module.import_aliases = import_aliases  # Imported at the top
 
-def load_decorator(*modules: str, silent: bool = False):
+# These will be added after their definitions
+# We'll use a simple approach to expose these functions
+
+
+def load_decorator(*modules: str, silent: bool = False) -> Callable[[F], F]:
     """Decorator to preload dependencies before function execution.
     
     Args:
@@ -385,7 +408,7 @@ def load_decorator(*modules: str, silent: bool = False):
                     alias, module_name = module_spec.split('=', 1)
                     globals()[alias] = load(module_name, silent=silent)
                 else:
-                    load(module_name, silent=silent)
+                    load(module_spec, silent=silent)
             return func(*args, **kwargs)
         return cast(F, wrapper)
     return decorator
@@ -420,45 +443,17 @@ def test_cache_info() -> None:
     print("✅ Cache info test completed")
 
 
-def import_aliases(*names):
-    """Import multiple modules and return them as a tuple.
-
-    Args:
-        *names: Module names to import. Can include aliases using 'alias=module_name' syntax.
-
-    Returns:
-        A tuple containing the imported modules in the order they were requested.
-
-    Example:
-        # Import with default names
-        np, pd = import_aliases('numpy', 'pandas')
-
-        # Import with aliases
-        plt, sns = import_aliases('plt=matplotlib.pyplot', 'sns=seaborn')
-    """
-    result = []
-    for name in names:
-        if "=" in name:
-            alias, module_name = name.split("=", 1)
-        else:
-            module_name = name
-
-        try:
-            module = __import__(module_name.split(".")[0])
-            # Handle submodules (e.g., matplotlib.pyplot)
-            for part in module_name.split(".")[1:]:
-                module = getattr(module, part)
-            result.append(module)
-        except ImportError as e:
-            raise ImportError("Could not import {0}: {1}".format(module_name, e))
-
-    return tuple(result) if len(result) > 1 else result[0] if result else None
-
-
 # Import and inject common aliases
 _import_common_aliases()
 
-# Replace the module in sys.modules with our new module
+# Now that all functions are defined, add them to the module
+new_module.load_decorator = load_decorator
+new_module.test_cache_info = test_cache_info
+
+# Set __all__ on the new module
+new_module.__all__ = __all__.copy()
+
+# Replace the module in sys.modules
 sys.modules[__name__] = new_module
 
 # Add the import_aliases and load functions to the module
